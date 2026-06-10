@@ -1,6 +1,11 @@
 let running = false;
 let doneCount = 0;
 
+// ── Selected image state ──────────────────────────────────────────────────────
+let selectedImageData = null;   // base64 data URL
+let selectedImageName = null;
+let selectedImageMime = null;
+
 const statusBox    = document.getElementById('statusBox');
 const startBtn     = document.getElementById('startBtn');
 const stopBtn      = document.getElementById('stopBtn');
@@ -9,6 +14,19 @@ const doneEl       = document.getElementById('doneCount');
 const remEl        = document.getElementById('remCount');
 const upscaleCheck = document.getElementById('upscale2k');
 const upscaleBadge = document.getElementById('upscaleBadge');
+
+// Image upload elements
+const imageFileInput = document.getElementById('imageFileInput');
+const imageDropZone  = document.getElementById('imageDropZone');
+const imagePreview   = document.getElementById('imagePreview');
+const imageThumb     = document.getElementById('imageThumb');
+const imageNameEl    = document.getElementById('imageName');
+const imageSizeEl    = document.getElementById('imageSize');
+const removeImageBtn = document.getElementById('removeImageBtn');
+const imageBadge     = document.getElementById('imageBadge');
+const imageHint      = document.querySelector('.image-upload-hint');
+
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 // Load saved upscale preference
 chrome.storage.local.get(['upscale2k'], (result) => {
@@ -24,6 +42,107 @@ upscaleCheck.addEventListener('change', () => {
   upscaleBadge.classList.toggle('active', upscaleCheck.checked);
 });
 
+// ── Image upload handlers ─────────────────────────────────────────────────────
+
+// Click on dropzone → open file picker
+imageDropZone.addEventListener('click', () => {
+  imageFileInput.click();
+});
+
+// File input change
+imageFileInput.addEventListener('change', (e) => {
+  if (e.target.files && e.target.files[0]) {
+    handleImageFile(e.target.files[0]);
+  }
+});
+
+// Drag-and-drop
+imageDropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  imageDropZone.classList.add('drag-over');
+});
+
+imageDropZone.addEventListener('dragleave', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  imageDropZone.classList.remove('drag-over');
+});
+
+imageDropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  imageDropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    const file = e.dataTransfer.files[0];
+    if (file.type.startsWith('image/')) {
+      handleImageFile(file);
+    } else {
+      log('Only image files are supported.', 'err');
+    }
+  }
+});
+
+// Remove image
+removeImageBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  clearImage();
+});
+
+function handleImageFile(file) {
+  // Validate type
+  const validTypes = ['image/png', 'image/jpeg', 'image/webp'];
+  if (!validTypes.includes(file.type)) {
+    log('Unsupported format. Use PNG, JPG, or WebP.', 'err');
+    return;
+  }
+
+  // Validate size
+  if (file.size > MAX_IMAGE_SIZE) {
+    log(`Image too large (${formatFileSize(file.size)}). Max 10 MB.`, 'err');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    selectedImageData = e.target.result;  // base64 data URL
+    selectedImageName = file.name;
+    selectedImageMime = file.type;
+
+    // Show preview
+    imageThumb.src = selectedImageData;
+    imageNameEl.textContent = file.name;
+    imageSizeEl.textContent = formatFileSize(file.size);
+    imagePreview.classList.add('visible');
+    imageDropZone.style.display = 'none';
+    if (imageHint) imageHint.style.display = 'none';
+    imageBadge.classList.add('active');
+
+    log(`📎 Image attached: ${file.name}`, 'ok');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearImage() {
+  selectedImageData = null;
+  selectedImageName = null;
+  selectedImageMime = null;
+  imageFileInput.value = '';
+  imageThumb.src = '';
+  imagePreview.classList.remove('visible');
+  imageDropZone.style.display = '';
+  if (imageHint) imageHint.style.display = '';
+  imageBadge.classList.remove('active');
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+// ── Logging ───────────────────────────────────────────────────────────────────
+
 function log(msg, type = 'line') {
   const d = document.createElement('div');
   d.className = `log-${type}`;
@@ -32,6 +151,8 @@ function log(msg, type = 'line') {
   statusBox.scrollTop = statusBox.scrollHeight;
   if (statusBox.children.length > 50) statusBox.removeChild(statusBox.firstChild);
 }
+
+// ── Tab & content script helpers ──────────────────────────────────────────────
 
 async function getFlowTab() {
   const tabs = await chrome.tabs.query({ url: 'https://labs.google/*' });
@@ -67,18 +188,25 @@ async function ensureContentScript(tab) {
   });
 }
 
+// ── Core generation logic ─────────────────────────────────────────────────────
+
 async function injectAndRun(tab, prompt, prefix, index) {
   const ready = await ensureContentScript(tab);
   if (!ready) return false;
 
   return new Promise((resolve) => {
-    chrome.tabs.sendMessage(tab.id, {
+    const message = {
       action: 'injectPrompt',
       prompt,
       prefix,
       index,
-      upscale: upscaleCheck.checked
-    }, (response) => {
+      upscale: upscaleCheck.checked,
+      imageData: selectedImageData || null,
+      imageMimeType: selectedImageMime || null,
+      imageName: selectedImageName || null
+    };
+
+    chrome.tabs.sendMessage(tab.id, message, (response) => {
       if (chrome.runtime.lastError) {
         log('Message error: ' + chrome.runtime.lastError.message, 'err');
         resolve(false);
@@ -92,6 +220,8 @@ async function injectAndRun(tab, prompt, prefix, index) {
     });
   });
 }
+
+// ── Button handlers ───────────────────────────────────────────────────────────
 
 startBtn.addEventListener('click', async () => {
   const prompt = document.getElementById('prompt').value.trim();
@@ -108,7 +238,8 @@ startBtn.addEventListener('click', async () => {
   doneCount = 0;
   doneEl.textContent = 0;
   startBtn.disabled = true;
-  log(`Starting ${count} generation(s) · ${delay}s apart`, 'info');
+  const imgInfo = selectedImageData ? ' + 📎 image' : '';
+  log(`Starting ${count} generation(s) · ${delay}s apart${imgInfo}`, 'info');
 
   for (let i = 0; i < count; i++) {
     if (!running) { log('Stopped.', 'line'); break; }
@@ -145,7 +276,8 @@ manualBtn.addEventListener('click', async () => {
   const tab = await getFlowTab();
   if (!tab) return;
 
-  log('Running once…', 'info');
+  const imgInfo = selectedImageData ? ' + 📎 image' : '';
+  log('Running once…' + imgInfo, 'info');
   const ok = await injectAndRun(tab, prompt, prefix, doneCount);
   if (ok) { doneCount++; doneEl.textContent = doneCount; }
 });

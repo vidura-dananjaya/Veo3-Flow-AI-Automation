@@ -257,6 +257,142 @@
       opacity: 1;
       box-shadow: 0 0 8px rgba(124, 106, 247, 0.5);
     }
+
+    /* Image upload zone */
+    .image-upload-zone {
+      border: 1.5px dashed #2a2a3e;
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s;
+      background: #111118;
+      position: relative;
+    }
+
+    .image-upload-zone:hover {
+      border-color: #7c6af7;
+      background: #13131f;
+    }
+
+    .image-upload-zone.drag-over {
+      border-color: #7c6af7;
+      background: rgba(124, 106, 247, 0.08);
+      box-shadow: 0 0 16px rgba(124, 106, 247, 0.15);
+    }
+
+    .image-upload-zone .upload-icon {
+      font-size: 20px;
+      margin-bottom: 4px;
+      opacity: 0.5;
+    }
+
+    .image-upload-zone .upload-text {
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 0.5px;
+    }
+
+    .image-upload-zone .upload-text .browse-link {
+      color: #7c6af7;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .image-upload-zone .upload-text .browse-link:hover {
+      color: #9b8aff;
+    }
+
+    .image-upload-hint {
+      font-size: 9px;
+      color: #383848;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* Image preview */
+    .image-preview {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: #111118;
+      border: 1px solid #2a2a3e;
+      border-radius: 6px;
+      padding: 8px 10px;
+      position: relative;
+    }
+
+    .image-preview.visible {
+      display: flex;
+    }
+
+    .image-preview-thumb {
+      width: 44px;
+      height: 44px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #2a2a3e;
+      flex-shrink: 0;
+    }
+
+    .image-preview-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .image-preview-name {
+      font-size: 10px;
+      color: #aaa;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .image-preview-size {
+      font-size: 9px;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    .remove-image-btn {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      padding: 0;
+      border-radius: 50%;
+      background: #1e1e2e;
+      border: 1px solid #2a2a3e;
+      color: #888;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .remove-image-btn:hover {
+      border-color: #f74a4a;
+      color: #f74a4a;
+      background: rgba(247, 74, 74, 0.1);
+    }
+
+    .image-badge {
+      font-size: 9px;
+      background: #2a6b4a;
+      color: #4af7a0;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      font-weight: bold;
+      opacity: 0;
+      transition: opacity 0.3s;
+      margin-left: auto;
+    }
+
+    .image-badge.active {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
@@ -268,6 +404,24 @@
   <div class="section">
     <label>Prompt</label>
     <textarea id="prompt" placeholder="A cat dancing in neon rain..."></textarea>
+  </div>
+
+  <div class="section">
+    <label>Reference Image <span style="color:#383848;text-transform:none;letter-spacing:0">(optional)</span> <span class="image-badge" id="imageBadge">📎 IMG</span></label>
+    <input type="file" id="imageFileInput" accept="image/png,image/jpeg,image/webp" style="display:none">
+    <div class="image-upload-zone" id="imageDropZone">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-text">Drop image here or <span class="browse-link">Browse</span></div>
+    </div>
+    <div class="image-upload-hint">PNG, JPG, WebP · max 10 MB</div>
+    <div class="image-preview" id="imagePreview">
+      <img class="image-preview-thumb" id="imageThumb" src="" alt="preview">
+      <div class="image-preview-info">
+        <div class="image-preview-name" id="imageName">—</div>
+        <div class="image-preview-size" id="imageSize">—</div>
+      </div>
+      <button class="remove-image-btn" id="removeImageBtn" title="Remove image">×</button>
+    </div>
   </div>
 
   <div class="section">

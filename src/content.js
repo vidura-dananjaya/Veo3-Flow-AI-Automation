@@ -1,11 +1,12 @@
 // ===================================================
-// Google Flow Auto Generator — Content Script v6
+// Google Flow Auto Generator — Content Script v6.4
 // Fix: Slate.js needs DataTransfer paste to register text in React state
+// New: Reference image attachment support
 // ===================================================
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'injectPrompt') {
-    handleGenerate(msg.prompt, msg.prefix, msg.index, msg.upscale)
+    handleGenerate(msg.prompt, msg.prefix, msg.index, msg.upscale, msg.imageData, msg.imageMimeType, msg.imageName)
       .then(result => sendResponse(result))
       .catch(err => sendResponse({ ok: false, error: err.message }));
     return true;
@@ -16,20 +17,66 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-async function handleGenerate(prompt, prefix, index, upscale = false) {
+async function handleGenerate(prompt, prefix, index, upscale = false, imageData = null, imageMimeType = null, imageName = null) {
   log('Finding prompt input...');
   const inputEl = await waitFor(findPromptInput, 8000);
   if (!inputEl) throw new Error('Prompt input not found.');
 
-  log('Clearing and pasting text via DataTransfer...');
-  await slateType(inputEl, prompt);
+  const urlBefore = window.location.href;
+
+  // ── STEP 1: Drag-drop image into prompt box FIRST ───────────────────────
+  if (imageData) {
+    log('📎 STEP 1: Dropping image into prompt box...');
+    try {
+      const imageFile = base64ToFile(imageData, imageName || 'reference.png', imageMimeType || 'image/png');
+      const injected = await injectImageToPromptBox(inputEl, imageFile);
+
+      if (injected) {
+        log('✓ Image dropped into prompt box');
+      } else {
+        log('⚠ Image drop may have failed — continuing with prompt only');
+      }
+
+      // ── STEP 2: Wait for image to upload ──────────────────────────────
+      log('📎 STEP 2: Waiting for image upload to complete...');
+      const uploaded = await waitForImageUpload(15000);
+      if (uploaded) {
+        log('✓ Image upload detected');
+      } else {
+        log('⚠ Could not confirm image upload — continuing anyway');
+      }
+
+      // Check if Flow redirected (bad — means wrong upload method triggered)
+      if (window.location.href !== urlBefore) {
+        log('⚠ Flow navigated! URL: ' + window.location.href);
+        throw new Error('Flow redirected after image drop. Image might have triggered wrong handler.');
+      }
+
+      await sleep(500);
+    } catch (e) {
+      log('⚠ Image error: ' + e.message + ' — continuing with prompt only');
+    }
+  }
+
+  // ── STEP 3: Type prompt text AFTER image ────────────────────────────────
+  log('STEP 3: Typing prompt text...');
+  // Re-find editor in case DOM changed after image upload
+  const editorEl = findPromptInput() || inputEl;
+  await slateType(editorEl, prompt);
   await sleep(600);
 
-  // Verify Slate internal state has text
-  const visible = inputEl.textContent?.replace(/\u200B/g, '').trim();
+  // Verify text
+  const visible = editorEl.textContent?.replace(/\u200B/g, '').trim();
   log('Visible text: "' + visible + '"');
 
-  log('Finding send button...');
+  if (!visible || visible === 'What do you want to create?') {
+    log('Text not set — retrying...');
+    await slateType(editorEl, prompt);
+    await sleep(600);
+  }
+
+  // ── STEP 4: Click send ──────────────────────────────────────────────────
+  log('STEP 4: Finding send button...');
   const sendBtn = await waitFor(findSendButton, 5000);
   if (!sendBtn) throw new Error('Send button not found.');
 
@@ -75,6 +122,249 @@ async function handleGenerate(prompt, prefix, index, upscale = false) {
     await downloadMedia(url, filename);
   }
   return { ok: true };
+}
+
+// ── Convert base64 data URL to File object ────────────────────────────────────
+function base64ToFile(dataUrl, filename, mimeType) {
+  const arr = dataUrl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || mimeType;
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) u8arr[n] = bstr.charCodeAt(n);
+  return new File([u8arr], filename, { type: mime });
+}
+
+// ── Inject image into prompt box via Flow's own file input ────────────────────
+// DOM inspection confirmed: Flow has <input type="file" accept="image/*"> near the prompt.
+// We find the + button, click it if needed, then set the file on the correct input.
+async function injectImageToPromptBox(editorEl, imageFile) {
+
+  // ── Strategy 1: Find and use the image file input directly ──
+  log('  Looking for image file input in prompt area...');
+
+  // Find the prompt area container first
+  const promptContainer = findPromptBoxContainer(editorEl);
+  log('  Prompt container: <' + promptContainer.tagName + '> class="' + (promptContainer.className || '').substring(0, 50) + '"');
+
+  // Look for file input inside the prompt container
+  let fileInput = promptContainer.querySelector('input[type="file"][accept*="image"]');
+
+  // If not found in container, search more broadly but specifically for image inputs
+  if (!fileInput) {
+    log('  File input not in prompt container — searching page...');
+    // Find all image file inputs and pick the one closest to the bottom (near prompt area)
+    const allImageInputs = [...document.querySelectorAll('input[type="file"][accept*="image"]')];
+    log('  Found ' + allImageInputs.length + ' image file input(s) on page');
+
+    if (allImageInputs.length > 0) {
+      // Pick the last one (usually the one near the prompt at bottom)
+      fileInput = allImageInputs[allImageInputs.length - 1];
+    }
+  }
+
+  if (!fileInput) {
+    // ── Strategy 2: Click the + button to make the file input appear ──
+    log('  No file input found yet — looking for + button...');
+    const plusBtn = findPlusButton(editorEl);
+    if (plusBtn) {
+      log('  Found + button: "' + (plusBtn.textContent || '').trim().substring(0, 20) + '" — clicking...');
+      plusBtn.click();
+      await sleep(1000);
+
+      // Now search again for the file input
+      fileInput = document.querySelector('input[type="file"][accept*="image"]');
+      if (!fileInput) {
+        fileInput = document.querySelector('input[type="file"]');
+      }
+    }
+  }
+
+  if (!fileInput) {
+    log('  ✗ No image file input found on page. Cannot inject image.');
+    return false;
+  }
+
+  log('  Found file input: accept="' + fileInput.accept + '" class="' + (fileInput.className || '').substring(0, 30) + '"');
+
+  // ── Set the file on the input ──
+  const dt = new DataTransfer();
+  dt.items.add(imageFile);
+  fileInput.files = dt.files;
+
+  // Dispatch events to notify React/Flow about the file selection
+  fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+  fileInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+  log('  File set on input and change event fired ✓');
+  await sleep(1000);
+
+  return true;
+}
+
+// ── Find the + button near the prompt area ────────────────────────────────────
+function findPlusButton(editorEl) {
+  const vh = window.innerHeight;
+
+  // Strategy 1: Look for buttons with "add" material icon text in the bottom area
+  const btns = [...document.querySelectorAll('button')]
+    .filter(b => b.offsetParent && b.getBoundingClientRect().top > vh * 0.6);
+
+  for (const btn of btns) {
+    const text = (btn.textContent || '').trim().toLowerCase();
+    // Material icon "add" renders as text "add" or just "+"
+    if (text === 'add' || text === '+' || text === 'add_circle' || text === 'add_photo_alternate') {
+      return btn;
+    }
+  }
+
+  // Strategy 2: Look for small buttons near the editor
+  const editorRect = editorEl.getBoundingClientRect();
+  for (const btn of btns) {
+    const r = btn.getBoundingClientRect();
+    // Button should be near the bottom-left of the editor, small
+    if (Math.abs(r.bottom - editorRect.bottom) < 60 && r.width < 60 && r.height < 60) {
+      const text = (btn.textContent || '').trim();
+      if (text.length <= 5) { // Short text = likely an icon button
+        return btn;
+      }
+    }
+  }
+
+  // Strategy 3: Look for the first small button to the left of the editor
+  for (const btn of btns) {
+    const r = btn.getBoundingClientRect();
+    if (r.right < editorRect.left + 60 && r.width < 50) {
+      return btn;
+    }
+  }
+
+  return null;
+}
+
+// ── Find the prompt box container ─────────────────────────────────────────────
+function findPromptBoxContainer(editorEl) {
+  let el = editorEl;
+
+  // Walk up the DOM to find the prompt area wrapper
+  for (let i = 0; i < 8; i++) {
+    if (!el.parentElement || el.parentElement === document.body) break;
+    el = el.parentElement;
+
+    // Check if this element contains a file input (good sign it's the right container)
+    if (el.querySelector('input[type="file"]')) {
+      log('  Found container with file input at level ' + (i + 1));
+      return el;
+    }
+
+    // Also check for known patterns
+    const cls = (el.className || '').toLowerCase();
+    if (cls.includes('prompt') || cls.includes('composer') || cls.includes('input-area')) {
+      return el;
+    }
+  }
+
+  // Fallback: go 5 levels up (to capture the full prompt bar area)
+  let container = editorEl;
+  for (let i = 0; i < 5; i++) {
+    if (container.parentElement && container.parentElement !== document.body) {
+      container = container.parentElement;
+    }
+  }
+  return container;
+}
+
+// ── Wait for image upload to complete ─────────────────────────────────────────
+async function waitForImageUpload(timeout = 15000) {
+  const t0 = Date.now();
+
+  // Snapshot current state
+  const initialImgCount = document.querySelectorAll('img').length;
+  const initialChipCount = document.querySelectorAll('[class*="chip"], [class*="thumb"], [class*="preview"], [class*="attach"]').length;
+
+  while (Date.now() - t0 < timeout) {
+    await sleep(500);
+
+    // Check if URL changed (redirect = bad)
+    if (window.location.href.includes('/trash') || window.location.href.includes('/delete')) {
+      log('  ⚠ Detected redirect to trash/delete — aborting wait');
+      return false;
+    }
+
+    // Check 1: New images appeared
+    const currentImgCount = document.querySelectorAll('img').length;
+    if (currentImgCount > initialImgCount) {
+      log('  Upload indicator: new image element appeared');
+      await sleep(500); // Let it settle
+      return true;
+    }
+
+    // Check 2: New chip/thumbnail/preview elements
+    const currentChipCount = document.querySelectorAll('[class*="chip"], [class*="thumb"], [class*="preview"], [class*="attach"]').length;
+    if (currentChipCount > initialChipCount) {
+      log('  Upload indicator: new chip/preview element appeared');
+      await sleep(500);
+      return true;
+    }
+
+    // Check 3: Spinner appeared
+    const spinners = document.querySelectorAll('[class*="loading"], [class*="spinner"], [class*="progress"], [role="progressbar"]');
+    if (spinners.length > 0) {
+      log('  Upload indicator: spinner detected — waiting...');
+      await waitUntil(() => {
+        return document.querySelectorAll('[class*="loading"], [class*="spinner"], [class*="progress"], [role="progressbar"]').length === 0;
+      }, timeout - (Date.now() - t0));
+      await sleep(500);
+      return true;
+    }
+
+    // Check 4: Near-editor thumbnail
+    const editorArea = document.querySelector('[contenteditable="true"]');
+    if (editorArea) {
+      const parent = editorArea.parentElement?.parentElement?.parentElement;
+      if (parent) {
+        const nearbyImgs = parent.querySelectorAll('img');
+        for (const img of nearbyImgs) {
+          const r = img.getBoundingClientRect();
+          if (r.width > 30 && r.width < 300 && r.height > 30) {
+            log('  Upload indicator: image thumbnail near editor');
+            return true;
+          }
+        }
+      }
+    }
+  }
+
+  return false;
+}
+// ── Check if an image was successfully attached ──────────────────────────────
+function checkImageAttached() {
+  // Look for signs that an image chip/thumbnail appeared in the editor area
+  const vh = window.innerHeight;
+
+  // Check for image thumbnails / chips in the bottom portion of the page
+  const chips = document.querySelectorAll('[class*="chip"], [class*="thumbnail"], [class*="preview"], [class*="attachment"]');
+  for (const chip of chips) {
+    const r = chip.getBoundingClientRect();
+    if (r.top > vh * 0.4 && r.width > 20 && r.height > 20 && chip.offsetParent) {
+      return true;
+    }
+  }
+
+  // Check for small images near the editor that appeared recently
+  const editorArea = document.querySelector('[contenteditable="true"]');
+  if (editorArea) {
+    const parent = editorArea.closest('[class*="editor"]') || editorArea.parentElement?.parentElement;
+    if (parent) {
+      const imgs = parent.querySelectorAll('img');
+      for (const img of imgs) {
+        const r = img.getBoundingClientRect();
+        if (r.width > 20 && r.width < 200 && r.height > 20) return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 // ── Type into Slate.js using DataTransfer paste (the only reliable method) ────
@@ -550,4 +840,4 @@ function dumpPopups() {
   });
 }
 
-log('v6 ready — Slate.js DataTransfer paste. 2K upscale via keyboard navigation.');
+log('v6.4 ready — Slate.js DataTransfer paste. 2K upscale. Image attachment support.');
