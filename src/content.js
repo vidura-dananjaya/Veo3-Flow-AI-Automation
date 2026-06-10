@@ -135,71 +135,90 @@ function base64ToFile(dataUrl, filename, mimeType) {
   return new File([u8arr], filename, { type: mime });
 }
 
-// ── Inject image into prompt box via Flow's own file input ────────────────────
-// DOM inspection confirmed: Flow has <input type="file" accept="image/*"> near the prompt.
-// We find the + button, click it if needed, then set the file on the correct input.
+// ── Inject image into prompt box via Paste & Drop ────────────────────────────
+// The file input approach uploads globally. To attach directly to the prompt,
+// we must simulate a paste or drop event directly on the contenteditable editor.
 async function injectImageToPromptBox(editorEl, imageFile) {
+  
+  // ── Strategy 1: Clipboard Paste Event ──
+  log('  Strategy 1: Simulating paste event on editor...');
+  try {
+    editorEl.focus();
+    await sleep(200);
 
-  // ── Strategy 1: Find and use the image file input directly ──
-  log('  Looking for image file input in prompt area...');
+    const dt = new DataTransfer();
+    dt.items.add(imageFile);
+    
+    const pasteEvent = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: dt
+    });
+    
+    editorEl.dispatchEvent(pasteEvent);
+    await sleep(1500);
 
-  // Find the prompt area container first
-  const promptContainer = findPromptBoxContainer(editorEl);
-  log('  Prompt container: <' + promptContainer.tagName + '> class="' + (promptContainer.className || '').substring(0, 50) + '"');
-
-  // Look for file input inside the prompt container
-  let fileInput = promptContainer.querySelector('input[type="file"][accept*="image"]');
-
-  // If not found in container, search more broadly but specifically for image inputs
-  if (!fileInput) {
-    log('  File input not in prompt container — searching page...');
-    // Find all image file inputs and pick the one closest to the bottom (near prompt area)
-    const allImageInputs = [...document.querySelectorAll('input[type="file"][accept*="image"]')];
-    log('  Found ' + allImageInputs.length + ' image file input(s) on page');
-
-    if (allImageInputs.length > 0) {
-      // Pick the last one (usually the one near the prompt at bottom)
-      fileInput = allImageInputs[allImageInputs.length - 1];
+    // Give it a moment to process the paste and check if UI updated
+    const uploaded = await waitForImageUpload(4000);
+    if (uploaded) {
+      log('  ✓ Paste strategy succeeded');
+      return true;
     }
+    log('  Paste strategy didn\'t show immediate UI changes.');
+  } catch (e) {
+    log('  Paste strategy failed: ' + e.message);
   }
 
-  if (!fileInput) {
-    // ── Strategy 2: Click the + button to make the file input appear ──
-    log('  No file input found yet — looking for + button...');
-    const plusBtn = findPlusButton(editorEl);
-    if (plusBtn) {
-      log('  Found + button: "' + (plusBtn.textContent || '').trim().substring(0, 20) + '" — clicking...');
-      plusBtn.click();
-      await sleep(1000);
+  // ── Strategy 2: Drag and Drop Event ──
+  log('  Strategy 2: Simulating drop event on prompt container...');
+  try {
+    const dropTarget = findPromptBoxContainer(editorEl);
+    const rect = dropTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
 
-      // Now search again for the file input
-      fileInput = document.querySelector('input[type="file"][accept*="image"]');
-      if (!fileInput) {
-        fileInput = document.querySelector('input[type="file"]');
-      }
+    const dtDrop = new DataTransfer();
+    dtDrop.items.add(imageFile);
+
+    const baseEvent = { bubbles: true, cancelable: true, dataTransfer: dtDrop, clientX: cx, clientY: cy };
+
+    dropTarget.dispatchEvent(new DragEvent('dragenter', baseEvent));
+    await sleep(100);
+    dropTarget.dispatchEvent(new DragEvent('dragover', baseEvent));
+    await sleep(100);
+    dropTarget.dispatchEvent(new DragEvent('drop', baseEvent));
+    
+    await sleep(1500);
+    const uploaded = await waitForImageUpload(4000);
+    if (uploaded) {
+      log('  ✓ Drop strategy succeeded');
+      return true;
     }
+  } catch (e) {
+    log('  Drop strategy failed: ' + e.message);
   }
 
-  if (!fileInput) {
-    log('  ✗ No image file input found on page. Cannot inject image.');
-    return false;
+  // ── Strategy 3: Global Body Paste ──
+  log('  Strategy 3: Global body paste...');
+  try {
+    const dtBody = new DataTransfer();
+    dtBody.items.add(imageFile);
+    document.body.dispatchEvent(new ClipboardEvent('paste', {
+      bubbles: true, cancelable: true, clipboardData: dtBody
+    }));
+    
+    await sleep(1500);
+    const uploaded = await waitForImageUpload(4000);
+    if (uploaded) {
+      log('  ✓ Global paste strategy succeeded');
+      return true;
+    }
+  } catch (e) {
+    log('  Global paste failed: ' + e.message);
   }
 
-  log('  Found file input: accept="' + fileInput.accept + '" class="' + (fileInput.className || '').substring(0, 30) + '"');
-
-  // ── Set the file on the input ──
-  const dt = new DataTransfer();
-  dt.items.add(imageFile);
-  fileInput.files = dt.files;
-
-  // Dispatch events to notify React/Flow about the file selection
-  fileInput.dispatchEvent(new Event('change', { bubbles: true }));
-  fileInput.dispatchEvent(new Event('input', { bubbles: true }));
-
-  log('  File set on input and change event fired ✓');
-  await sleep(1000);
-
-  return true;
+  log('  ⚠ All image injection strategies executed. Waiting for fallback confirmation.');
+  return false;
 }
 
 // ── Find the + button near the prompt area ────────────────────────────────────
@@ -534,7 +553,14 @@ function waitForNewMedia(snapshot, timeout = 120000) {
   return new Promise((resolve) => {
     const t0 = Date.now();
     const iv = setInterval(() => {
-      const imgs = [...document.querySelectorAll('img')].filter(i => looksGenerated(i.src) && i.offsetParent);
+      const imgs = [...document.querySelectorAll('img')].filter(i => {
+        if (!looksGenerated(i.src) || !i.offsetParent) return false;
+        // Ignore small thumbnails (e.g. the reference image chip)
+        const rect = i.getBoundingClientRect();
+        if (rect.width < 150 || rect.height < 150) return false;
+        return true;
+      });
+
       for (const i of imgs) {
         if (!snapshot.has(i.src)) {
           clearInterval(iv);
