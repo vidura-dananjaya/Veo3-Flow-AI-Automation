@@ -14,6 +14,7 @@ const doneEl       = document.getElementById('doneCount');
 const remEl        = document.getElementById('remCount');
 const upscaleCheck = document.getElementById('upscale2k');
 const upscaleBadge = document.getElementById('upscaleBadge');
+const videoModeCheck = document.getElementById('videoMode');
 
 // Image upload elements
 const imageFileInput = document.getElementById('imageFileInput');
@@ -28,11 +29,14 @@ const imageHint      = document.querySelector('.image-upload-hint');
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10 MB
 
-// Load saved upscale preference
-chrome.storage.local.get(['upscale2k'], (result) => {
+// Load saved preferences
+chrome.storage.local.get(['upscale2k', 'videoMode'], (result) => {
   if (result.upscale2k) {
     upscaleCheck.checked = true;
     upscaleBadge.classList.add('active');
+  }
+  if (result.videoMode) {
+    videoModeCheck.checked = true;
   }
 });
 
@@ -40,6 +44,11 @@ chrome.storage.local.get(['upscale2k'], (result) => {
 upscaleCheck.addEventListener('change', () => {
   chrome.storage.local.set({ upscale2k: upscaleCheck.checked });
   upscaleBadge.classList.toggle('active', upscaleCheck.checked);
+});
+
+// Save video mode preference on change
+videoModeCheck.addEventListener('change', () => {
+  chrome.storage.local.set({ videoMode: videoModeCheck.checked });
 });
 
 // ── Image upload handlers ─────────────────────────────────────────────────────
@@ -194,10 +203,21 @@ async function injectAndRun(tab, prompt, prefix, index) {
   const ready = await ensureContentScript(tab);
   if (!ready) return false;
 
+  let finalPrompt = prompt;
+  if (videoModeCheck && videoModeCheck.checked) {
+    if (!finalPrompt.toLowerCase().startsWith('generate a video:')) {
+      finalPrompt = 'Generate a video: ' + finalPrompt;
+    }
+  } else {
+    if (!finalPrompt.toLowerCase().startsWith('generate a image:')) {
+      finalPrompt = 'Generate a image: ' + finalPrompt;
+    }
+  }
+
   return new Promise((resolve) => {
     const message = {
       action: 'injectPrompt',
-      prompt,
+      prompt: finalPrompt,
       prefix,
       index,
       upscale: upscaleCheck.checked,

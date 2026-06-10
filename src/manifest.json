@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Google Flow Auto Generator",
-  "version": "6.4",
+  "version": "6.6",
   "description": "Automates prompt generation and media downloading in Google Labs Flow.",
   "permissions": [
     "downloads",
