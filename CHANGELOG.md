@@ -3,9 +3,9 @@
 ## v6.4
 - **New:** Support for attaching a reference image to the prompt. Includes an interactive drag-and-drop preview zone in the extension popup.
 - **Fix:** Redesigned the image injection logic to follow the exact Google Flow user sequence: inject image first, wait for upload confirmation, then type the prompt.
-- **Fix:** Targeted Flow's native `<input type="file" accept="image/*">` within the prompt container directly, avoiding synthetic drag-drop events which caused page redirects.
-- **Fix:** Added a fallback to click the `+` icon to reveal the native upload input if it is hidden in the DOM.
-- **New:** Added intelligent upload polling that watches for visual indicators (spinners, chips, thumbnails) to know exactly when the image finishes processing.
+- **Fix:** Switched image injection to use direct `ClipboardEvent` ('paste') and synthetic `DragEvent` ('drop') on the `contenteditable` editor, resolving the issue where file inputs were triggering a global project upload instead of attaching to the specific prompt box.
+- **Fix:** Fixed a bug where small reference image thumbnails were mistakenly detected as "newly generated media", which caused premature downloads and failed 2K upscales. `waitForNewMedia` now strictly filters out images under 150x150 pixels.
+- **New:** Added intelligent upload polling that watches for visual indicators (spinners, chips, thumbnails) to wait precisely until the reference image finishes processing before typing the text prompt.
 
 ## v6.3 — Current (Working ✅)
 - **Fix:** Substituted the fragile UI button targeting with direct right-click (contextmenu) interaction on generated images to reliably trigger the native upscale menus.
