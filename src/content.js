@@ -85,64 +85,114 @@ async function handleGenerate(prompt, prefix, index, upscale = false, imageData 
   sendBtn.click();
 
   log('Waiting for generated output...');
-  const mediaEl = await waitForNewMedia(snapshot, 120000, videoMode);
-  if (!mediaEl) throw new Error('No new image/video appeared after 120s.');
-
-  await sleep(1500);
-  let url = getMediaUrl(mediaEl);
-  if (!url) throw new Error('Media found but URL is empty.');
-
-  // Use Google Flow's native 2K upscale if enabled (skip videos)
-  let ext = getExt(url, mediaEl);
+  let mediaEl = null;
+  let url = null;
+  let ext = null;
   let googleHandled = false;
+  let downloadSuccess = false;
 
-  if (videoMode) {
-    if (upscale) {
-      log('Clicking Flow\'s video 1080p Upscaled button...');
-      try {
-        const upscaledUrl = await clickFlowVideoDownload(mediaEl, '1080p');
-        if (upscaledUrl === '__GOOGLE_HANDLED__') {
-          log('Video download handled by Google Flow directly (1080p Upscaled).');
-          googleHandled = true;
-        } else {
-          log('1080p Upscaled download failed, downloading original.');
-        }
-      } catch (e) {
-        log('Video upscale failed, downloading original: ' + e.message);
-      }
-    } else {
-      log('Clicking Flow\'s video Original Size button...');
-      try {
-        const originalUrl = await clickFlowVideoDownload(mediaEl, 'Original Size');
-        if (originalUrl === '__GOOGLE_HANDLED__') {
-          log('Video download handled by Google Flow directly (Original Size).');
-          googleHandled = true;
-        } else {
-          log('Original Size download failed.');
-        }
-      } catch (e) {
-        log('Original Size download failed: ' + e.message);
-      }
+  const t0 = Date.now();
+  const timeout = 300000;
+
+  while (Date.now() - t0 < timeout) {
+    mediaEl = await waitForNewMedia(snapshot, 60000, videoMode);
+    if (!mediaEl) {
+      log('No new media detected in this cycle, still waiting...');
+      continue;
     }
-  } else if (upscale && mediaEl.tagName === 'IMG') {
-    log('Clicking Flow\'s native 2K upscale button...');
-    try {
-      const upscaledUrl = await clickFlowUpscale2K(mediaEl);
-      if (upscaledUrl === '__GOOGLE_HANDLED__') {
-        log('2K download handled by Google Flow directly. Skipping our download.');
-        googleHandled = true;
-      } else if (upscaledUrl) {
-        url = upscaledUrl;
-        ext = getExt(url, mediaEl);
-        log('2K upscale complete ✓ (Google AI upscaled)');
+
+    await sleep(1500);
+    url = getMediaUrl(mediaEl);
+    if (!url) {
+      log('Media found but URL is empty. Ignoring...');
+      snapshot.add(getBaseId(mediaEl.src || mediaEl.querySelector('source')?.src));
+      continue;
+    }
+
+    ext = getExt(url, mediaEl);
+    googleHandled = false;
+    downloadSuccess = false;
+
+    if (videoMode) {
+      if (upscale) {
+        log('Clicking Flow\'s video 1080p Upscaled button...');
+        try {
+          const upscaledUrl = await clickFlowVideoDownload(mediaEl, '1080p');
+          if (upscaledUrl === '__GOOGLE_HANDLED__') {
+            log('Video download handled by Google Flow directly (1080p Upscaled).');
+            googleHandled = true;
+            downloadSuccess = true;
+          } else {
+            log('1080p Upscaled download failed.');
+          }
+        } catch (e) {
+          log('Video upscale failed: ' + e.message);
+        }
       } else {
-        log('2K upscale failed, downloading original.');
+        log('Clicking Flow\'s video Original Size button...');
+        try {
+          const originalUrl = await clickFlowVideoDownload(mediaEl, 'Original Size');
+          if (originalUrl === '__GOOGLE_HANDLED__') {
+            log('Video download handled by Google Flow directly (Original Size).');
+            googleHandled = true;
+            downloadSuccess = true;
+          } else {
+            log('Original Size download failed.');
+          }
+        } catch (e) {
+          log('Original Size download failed: ' + e.message);
+        }
       }
-    } catch (e) {
-      log('Upscale failed, downloading original: ' + e.message);
+    } else if (upscale && mediaEl.tagName === 'IMG') {
+      log('Clicking Flow\'s native 2K upscale button...');
+      try {
+        const upscaledUrl = await clickFlowUpscale2K(mediaEl);
+        if (upscaledUrl === '__GOOGLE_HANDLED__') {
+          log('2K download handled by Google Flow directly. Skipping our download.');
+          googleHandled = true;
+          downloadSuccess = true;
+        } else if (upscaledUrl) {
+          url = upscaledUrl;
+          ext = getExt(url, mediaEl);
+          log('2K upscale complete ✓ (Google AI upscaled)');
+          downloadSuccess = true;
+        } else {
+          log('2K upscale failed.');
+        }
+      } catch (e) {
+        log('Upscale failed: ' + e.message);
+      }
+    } else if (upscale && mediaEl.tagName === 'VIDEO') {
+      log('Upscale skipped — video files are not supported.');
+      downloadSuccess = true;
+    } else {
+      // Original Size Image
+      log('Checking if it is fully generated by looking for the Download menu...');
+      try {
+        const dlUrl = await attemptVideoDownloadViaContextMenu(mediaEl, 'Download');
+        if (dlUrl === '__GOOGLE_HANDLED__') {
+          googleHandled = true;
+          downloadSuccess = true;
+        } else if (dlUrl) {
+          downloadSuccess = true;
+        } else {
+          log('Download menu not found. It might be a placeholder.');
+        }
+      } catch(e) {
+        log('Download check failed: ' + e.message);
+      }
     }
-  } else if (upscale && mediaEl.tagName === 'VIDEO') {
-    log('Upscale skipped — video files are not supported.');
+
+    if (downloadSuccess) {
+      break;
+    } else {
+      log('Failed to download. It might be a placeholder or still generating. Retrying without adding to ignore list...');
+      await sleep(3000);
+    }
+  }
+
+  if (!downloadSuccess) {
+    throw new Error('Failed to generate or download media after 5 minutes of retries.');
   }
 
   if (!googleHandled) {
@@ -596,9 +646,9 @@ function waitForNewMedia(snapshot, timeout = 120000, videoMode = false) {
       const vids = [...document.querySelectorAll('video')].filter(v => v.offsetParent && looksGenerated(v.src || v.querySelector('source')?.src));
       for (const v of vids) {
         const src = v.src || v.querySelector('source')?.src;
-        if (!snapshot.has(getBaseId(src)) && findMoreButtonForMedia(v)) {
+        if (!snapshot.has(getBaseId(src))) {
           clearInterval(iv);
-          log('New video detected (with ⋮ button)!');
+          log('New video detected!');
           resolve(v);
           return;
         }
@@ -614,9 +664,9 @@ function waitForNewMedia(snapshot, timeout = 120000, videoMode = false) {
       });
 
       for (const i of imgs) {
-        if (!snapshot.has(getBaseId(i.src)) && findMoreButtonForMedia(i)) {
+        if (!snapshot.has(getBaseId(i.src))) {
           clearInterval(iv);
-          log('New media detected (with ⋮ button)!');
+          log('New media detected!');
           resolve(i);
           return;
         }

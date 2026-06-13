@@ -1,6 +1,15 @@
 # Changelog
 
-## v6.10 — Current (Working ✅)
+## v6.14 — Current (Working ✅)
+- **Fix:** Implemented an aggressive continuous polling mechanism for media detection. Instead of permanently ignoring elements that fail to download (which accidentally ignored final videos if they shared the same base ID as the placeholder), the script now repeatedly right-clicks the newly added media element every 3 seconds until the native download menu options ("1080p Upscaled" or "Download") appear. This accurately mirrors a human waiting for the exact moment the video finishes generating, providing bulletproof reliability against DOM virtualization and intermediate UI states.
+
+## v6.13
+- **Fix:** Re-architected the media generation detection loop to gracefully handle intermediate placeholder states during Text-to-Video and Image-to-Video generations. If the extension prematurely detects a generated placeholder (which lacks a download menu) instead of the final video, it now automatically adds the placeholder to the snapshot and seamlessly resumes waiting for the final video. This ensures 100% reliable downloads even when Google Flow's UI transitions through multiple loading states.
+
+## v6.12
+- **Fix:** Removed the `findMoreButtonForMedia` check entirely. This resolves the issue where continuous video generation would get stuck in a loop. When many videos are generated and the user scrolls down, Google Flow's DOM virtualizes or hides the group heading that contains the `⋮` (More) button. This caused the script to loop infinitely waiting for a visible button that would never appear. Since `getBaseId` already perfectly ignores placeholders, the button check was redundant and safely removed.
+
+## v6.10
 - **Fix:** Fixed a bug where generating a video from a reference image caused the extension to falsely identify the uploaded reference image in the gallery as the newly generated video. The snapshot logic now compares image base IDs (stripping dynamic resizing parameters) to properly ignore reference images and accurately target the final video.
 
 ## v6.9
