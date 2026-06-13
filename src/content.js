@@ -561,12 +561,22 @@ function looksGenerated(src) {
   return src.length > 80;
 }
 
+function getBaseId(url) {
+  if (!url) return '';
+  if (url.startsWith('blob:')) return url;
+  const eqIdx = url.indexOf('=');
+  if (eqIdx !== -1 && (url.includes('googleusercontent') || url.includes('googleapis'))) {
+    return url.substring(0, eqIdx);
+  }
+  return url;
+}
+
 function captureCurrentMedia() {
   const imgs = [...document.querySelectorAll('img')].filter(i => looksGenerated(i.src));
   const vids = [...document.querySelectorAll('video')].filter(v => looksGenerated(v.src || v.querySelector('source')?.src));
   const current = new Set();
-  imgs.forEach(i => current.add(i.src));
-  vids.forEach(v => current.add(v.src || v.querySelector('source')?.src));
+  imgs.forEach(i => current.add(getBaseId(i.src)));
+  vids.forEach(v => current.add(getBaseId(v.src || v.querySelector('source')?.src)));
   return current;
 }
 
@@ -586,9 +596,9 @@ function waitForNewMedia(snapshot, timeout = 120000, videoMode = false) {
       const vids = [...document.querySelectorAll('video')].filter(v => v.offsetParent && looksGenerated(v.src || v.querySelector('source')?.src));
       for (const v of vids) {
         const src = v.src || v.querySelector('source')?.src;
-        if (!snapshot.has(src)) {
+        if (!snapshot.has(getBaseId(src)) && findMoreButtonForMedia(v)) {
           clearInterval(iv);
-          log('New video detected!');
+          log('New video detected (with ⋮ button)!');
           resolve(v);
           return;
         }
@@ -604,9 +614,9 @@ function waitForNewMedia(snapshot, timeout = 120000, videoMode = false) {
       });
 
       for (const i of imgs) {
-        if (!snapshot.has(i.src)) {
+        if (!snapshot.has(getBaseId(i.src)) && findMoreButtonForMedia(i)) {
           clearInterval(iv);
-          log('New media detected!');
+          log('New media detected (with ⋮ button)!');
           resolve(i);
           return;
         }

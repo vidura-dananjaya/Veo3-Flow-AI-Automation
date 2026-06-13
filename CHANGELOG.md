@@ -1,6 +1,12 @@
 # Changelog
 
-## v6.8 — Current (Working ✅)
+## v6.10 — Current (Working ✅)
+- **Fix:** Fixed a bug where generating a video from a reference image caused the extension to falsely identify the uploaded reference image in the gallery as the newly generated video. The snapshot logic now compares image base IDs (stripping dynamic resizing parameters) to properly ignore reference images and accurately target the final video.
+
+## v6.9
+- **Fix:** Resolved an issue where Image-to-Video generation would fail to download because the extension mistakenly identified the generated placeholder thumbnail as the final video. The extension now intelligently waits for the `⋮` (More) button to appear on the media before triggering the download sequence, ensuring the video is fully processed.
+
+## v6.8
 - **New:** Video Mode support! Added a toggle in the popup to handle video prompt generations.
 - **New:** Video Downloading & Upscaling logic: 
   - If Upscale is enabled, automatically right-clicks the generated video and downloads the **1080p Upscaled** version.
