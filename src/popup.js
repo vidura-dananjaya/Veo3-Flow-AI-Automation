@@ -221,6 +221,7 @@ async function injectAndRun(tab, prompt, prefix, index) {
       prefix,
       index,
       upscale: upscaleCheck.checked,
+      videoMode: videoModeCheck ? videoModeCheck.checked : false,
       imageData: selectedImageData || null,
       imageMimeType: selectedImageMime || null,
       imageName: selectedImageName || null

@@ -6,7 +6,7 @@
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === 'injectPrompt') {
-    handleGenerate(msg.prompt, msg.prefix, msg.index, msg.upscale, msg.imageData, msg.imageMimeType, msg.imageName)
+    handleGenerate(msg.prompt, msg.prefix, msg.index, msg.upscale, msg.imageData, msg.imageMimeType, msg.imageName, msg.videoMode)
       .then(result => sendResponse(result))
       .catch(err => sendResponse({ ok: false, error: err.message }));
     return true;
@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
-async function handleGenerate(prompt, prefix, index, upscale = false, imageData = null, imageMimeType = null, imageName = null) {
+async function handleGenerate(prompt, prefix, index, upscale = false, imageData = null, imageMimeType = null, imageName = null, videoMode = false) {
   log('Finding prompt input...');
   const inputEl = await waitFor(findPromptInput, 8000);
   if (!inputEl) throw new Error('Prompt input not found.');
@@ -85,7 +85,7 @@ async function handleGenerate(prompt, prefix, index, upscale = false, imageData 
   sendBtn.click();
 
   log('Waiting for generated output...');
-  const mediaEl = await waitForNewMedia(snapshot, 120000);
+  const mediaEl = await waitForNewMedia(snapshot, 120000, videoMode);
   if (!mediaEl) throw new Error('No new image/video appeared after 120s.');
 
   await sleep(1500);
@@ -95,7 +95,36 @@ async function handleGenerate(prompt, prefix, index, upscale = false, imageData 
   // Use Google Flow's native 2K upscale if enabled (skip videos)
   let ext = getExt(url, mediaEl);
   let googleHandled = false;
-  if (upscale && mediaEl.tagName === 'IMG') {
+
+  if (videoMode) {
+    if (upscale) {
+      log('Clicking Flow\'s video 1080p Upscaled button...');
+      try {
+        const upscaledUrl = await clickFlowVideoDownload(mediaEl, '1080p');
+        if (upscaledUrl === '__GOOGLE_HANDLED__') {
+          log('Video download handled by Google Flow directly (1080p Upscaled).');
+          googleHandled = true;
+        } else {
+          log('1080p Upscaled download failed, downloading original.');
+        }
+      } catch (e) {
+        log('Video upscale failed, downloading original: ' + e.message);
+      }
+    } else {
+      log('Clicking Flow\'s video Original Size button...');
+      try {
+        const originalUrl = await clickFlowVideoDownload(mediaEl, 'Original Size');
+        if (originalUrl === '__GOOGLE_HANDLED__') {
+          log('Video download handled by Google Flow directly (Original Size).');
+          googleHandled = true;
+        } else {
+          log('Original Size download failed.');
+        }
+      } catch (e) {
+        log('Original Size download failed: ' + e.message);
+      }
+    }
+  } else if (upscale && mediaEl.tagName === 'IMG') {
     log('Clicking Flow\'s native 2K upscale button...');
     try {
       const upscaledUrl = await clickFlowUpscale2K(mediaEl);
@@ -549,10 +578,23 @@ function downloadMedia(url, filename) {
   });
 }
 
-function waitForNewMedia(snapshot, timeout = 120000) {
+function waitForNewMedia(snapshot, timeout = 120000, videoMode = false) {
   return new Promise((resolve) => {
     const t0 = Date.now();
     const iv = setInterval(() => {
+      // Check for videos first
+      const vids = [...document.querySelectorAll('video')].filter(v => v.offsetParent && looksGenerated(v.src || v.querySelector('source')?.src));
+      for (const v of vids) {
+        const src = v.src || v.querySelector('source')?.src;
+        if (!snapshot.has(src)) {
+          clearInterval(iv);
+          log('New video detected!');
+          resolve(v);
+          return;
+        }
+      }
+
+      // Detect the thumbnail image for both videos and images
       const imgs = [...document.querySelectorAll('img')].filter(i => {
         if (!looksGenerated(i.src) || !i.offsetParent) return false;
         // Ignore small thumbnails (e.g. the reference image chip)
@@ -566,17 +608,6 @@ function waitForNewMedia(snapshot, timeout = 120000) {
           clearInterval(iv);
           log('New media detected!');
           resolve(i);
-          return;
-        }
-      }
-
-      const vids = [...document.querySelectorAll('video')].filter(v => v.offsetParent && looksGenerated(v.src || v.querySelector('source')?.src));
-      for (const v of vids) {
-        const src = v.src || v.querySelector('source')?.src;
-        if (!snapshot.has(src)) {
-          clearInterval(iv);
-          log('New video detected!');
-          resolve(v);
           return;
         }
       }
@@ -866,4 +897,147 @@ function dumpPopups() {
   });
 }
 
-log('v6.4 ready — Slate.js DataTransfer paste. 2K upscale. Image attachment support.');
+// ── Video Download Handlers ──────────────────────────────────────────────────
+async function clickFlowVideoDownload(mediaEl, targetText) {
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    log(`=== Video ${targetText} Attempt ${attempt}/2 ===`);
+    
+    let result = await attemptVideoDownloadViaContextMenu(mediaEl, targetText);
+    if (result) return result;
+    
+    pressEscape(3);
+    await sleep(1000);
+
+    result = await attemptVideoDownloadViaMoreButton(mediaEl, targetText);
+    if (result) return result;
+
+    if (attempt < 2) {
+      log('Retrying in 3s...');
+      pressEscape(5);
+      await sleep(3000);
+    }
+  }
+  log(`All video ${targetText} attempts failed.`);
+  return null;
+}
+
+async function attemptVideoDownloadViaContextMenu(mediaEl, targetText) {
+  log('--- Attempting via Right-Click ---');
+  const popupsBefore = document.querySelectorAll('[data-radix-menu-content], [data-radix-popper-content-wrapper]').length;
+  
+  const rect = mediaEl.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  
+  mediaEl.dispatchEvent(new MouseEvent('contextmenu', {
+    bubbles: true, cancelable: true, view: window, button: 2, buttons: 2, clientX: x, clientY: y
+  }));
+  
+  const menuAppeared = await waitUntil(() => {
+    return document.querySelectorAll('[data-radix-menu-content], [data-radix-popper-content-wrapper]').length > popupsBefore;
+  }, 3000);
+
+  if (!menuAppeared) {
+    log('Right-click menu failed to open.');
+    return null;
+  }
+  
+  log('Right-click menu opened ✓');
+  await sleep(500);
+  return await openDownloadAndClickTarget(targetText);
+}
+
+async function attemptVideoDownloadViaMoreButton(mediaEl, targetText) {
+  log('--- Attempting via ⋮ (More) button ---');
+  const moreBtn = findMoreButtonForMedia(mediaEl);
+  if (!moreBtn) {
+    log('⋮ button not found for this video.');
+    return null;
+  }
+
+  const popupsBefore = document.querySelectorAll('[data-radix-menu-content], [data-radix-popper-content-wrapper]').length;
+  moreBtn.click();
+  
+  const menuAppeared = await waitUntil(() => {
+    return document.querySelectorAll('[data-radix-menu-content], [data-radix-popper-content-wrapper]').length > popupsBefore;
+  }, 3000);
+
+  if (!menuAppeared) {
+    log('Popup failed to open after clicking ⋮');
+    return null;
+  }
+  
+  log('⋮ menu opened ✓');
+  await sleep(500);
+  return await openDownloadAndClickTarget(targetText);
+}
+
+async function openDownloadAndClickTarget(targetText) {
+  log('Finding "Download" item in popup...');
+  
+  const quickTarget = searchAllPopups(targetText);
+  if (quickTarget) {
+    log(`Found ${targetText} directly in popup!`);
+    quickTarget.click();
+    await sleep(5000);
+    pressEscape(3);
+    return '__GOOGLE_HANDLED__';
+  }
+
+  const downloadItem = searchAllPopups('download');
+  if (!downloadItem) {
+    log('FAIL: "Download" not found in popup.');
+    dumpPopups();
+    pressEscape(3);
+    return null;
+  }
+  
+  log('Found "Download". Trying to open its submenu...');
+  downloadItem.focus();
+  await sleep(100);
+
+  const menusBefore = document.querySelectorAll('[data-radix-menu-content]').length;
+  
+  sendKey(downloadItem, 'ArrowRight');
+  await sleep(1000);
+
+  if (document.querySelectorAll('[data-radix-menu-content]').length <= menusBefore) {
+    log('  ArrowRight didn\'t open submenu. Trying hover events...');
+    downloadItem.dispatchEvent(new PointerEvent('pointerover', { bubbles: true }));
+    downloadItem.dispatchEvent(new PointerEvent('pointermove', { bubbles: true }));
+    downloadItem.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    await sleep(1000);
+  }
+
+  if (document.querySelectorAll('[data-radix-menu-content]').length <= menusBefore) {
+    log('  Hover didn\'t open submenu. Trying direct click()...');
+    downloadItem.click();
+    await sleep(1000);
+  }
+
+  log(`Finding "${targetText}" in submenu...`);
+  const btnTarget = searchAllPopups(targetText);
+  if (!btnTarget) {
+    log(`FAIL: Could not find "${targetText}" in submenu.`);
+    dumpPopups();
+    pressEscape(3);
+    return null;
+  }
+
+  log(`Found "${targetText}". Clicking it...`);
+  btnTarget.focus();
+  await sleep(100);
+  
+  sendKey(btnTarget, 'Enter');
+  await sleep(200);
+  btnTarget.click();
+
+  log(`${targetText} button clicked successfully ✓ Waiting for Google Flow to process...`);
+  
+  await sleep(5000);
+  pressEscape(3);
+
+  return '__GOOGLE_HANDLED__';
+}
+
+log('v6.5 ready — Video Download support added.');
