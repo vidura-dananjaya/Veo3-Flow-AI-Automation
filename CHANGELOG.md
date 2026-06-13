@@ -1,5 +1,13 @@
 # Changelog
 
+## v6.8 — Current (Working ✅)
+- **New:** Video Mode support! Added a toggle in the popup to handle video prompt generations.
+- **New:** Video Downloading & Upscaling logic: 
+  - If Upscale is enabled, automatically right-clicks the generated video and downloads the **1080p Upscaled** version.
+  - If Upscale is disabled, automatically right-clicks and downloads the **Original Size** video.
+- **Fix:** Fixed a bug where `waitForNewMedia` was mistakenly detecting and downloading the video's placeholder thumbnail `<img>` instead of the actual video. The extension now reliably clicks the thumbnail to trigger the video context menu.
+- **UI:** Simplified the upscale label from "Upscale images to 2K" to "Upscale" since it now applies to both images (2K) and videos (1080p).
+
 ## v6.4
 - **New:** Support for attaching a reference image to the prompt. Includes an interactive drag-and-drop preview zone in the extension popup.
 - **Fix:** Redesigned the image injection logic to follow the exact Google Flow user sequence: inject image first, wait for upload confirmation, then type the prompt.
@@ -7,7 +15,7 @@
 - **Fix:** Fixed a bug where small reference image thumbnails were mistakenly detected as "newly generated media", which caused premature downloads and failed 2K upscales. `waitForNewMedia` now strictly filters out images under 150x150 pixels.
 - **New:** Added intelligent upload polling that watches for visual indicators (spinners, chips, thumbnails) to wait precisely until the reference image finishes processing before typing the text prompt.
 
-## v6.3 — Current (Working ✅)
+## v6.3
 - **Fix:** Substituted the fragile UI button targeting with direct right-click (contextmenu) interaction on generated images to reliably trigger the native upscale menus.
 - **Fix:** Added multiple fallback layers (Arrow keys, Hover, Direct Click) to ensure the Radix UI "Download" submenu opens correctly.
 - **Fix:** Fixed an issue where `looksGenerated` check failed for newer API endpoints (e.g. `generativelanguage.googleapis`), causing time-outs.
