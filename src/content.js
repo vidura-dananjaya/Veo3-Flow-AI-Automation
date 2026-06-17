@@ -17,6 +17,15 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 });
 
+// --- Keep Background Service Worker Alive ---
+// Sending a message every 20s resets the Manifest V3 30s idle timer.
+setInterval(() => {
+  try {
+    chrome.runtime.sendMessage({ action: 'keepAlive' });
+  } catch (e) {}
+}, 20000);
+
+
 async function handleGenerate(prompt, prefix, index, upscale = false, imageData = null, imageMimeType = null, imageName = null, videoMode = false) {
   log('Finding prompt input...');
   const inputEl = await waitFor(findPromptInput, 8000);

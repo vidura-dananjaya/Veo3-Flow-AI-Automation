@@ -1,6 +1,12 @@
 # Changelog
 
-## v6.14 — Current (Working ✅)
+## v8.0 — Current (Working ✅)
+- **New Architecture:** Completely migrated to a pure WebSocket Server implementation using Python `asyncio` and `websockets`.
+- **Real-Time Delivery:** Generation commands are pushed instantly to the extension without HTTP polling delays.
+- **Robust Persistence:** Extension automatically reconnects to the WebSocket server if the connection drops.
+- **No More Sleep:** The Manifest V3 service worker uses a 20s heartbeat loop via the `content.js` script to permanently bypass the 30-second idle termination, preventing stuck/ghost processes.
+
+## v6.14 — Previous
 - **Fix:** Implemented an aggressive continuous polling mechanism for media detection. Instead of permanently ignoring elements that fail to download (which accidentally ignored final videos if they shared the same base ID as the placeholder), the script now repeatedly right-clicks the newly added media element every 3 seconds until the native download menu options ("1080p Upscaled" or "Download") appear. This accurately mirrors a human waiting for the exact moment the video finishes generating, providing bulletproof reliability against DOM virtualization and intermediate UI states.
 
 ## v6.13
