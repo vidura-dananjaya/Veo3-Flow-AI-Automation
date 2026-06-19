@@ -26,7 +26,7 @@ async def main():
             "prompt": "A futuristic city in neon colors, cyberpunk style",
             "count": 1,
             "delay": 30,
-            "upscale": False,
+            "upscale": True,
             "videoMode": False,
             "prefix": "cyber_"
         }
