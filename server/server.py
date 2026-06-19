@@ -167,8 +167,8 @@ async def main():
 Waiting for Chrome Extension or Python Scripts to connect...
 """)
     
-    # Start WebSocket Server
-    server = await websockets.serve(handle_client, "0.0.0.0", PORT)
+    # Start WebSocket Server with a large max_size to allow High-Res reference images (50 MB)
+    server = await websockets.serve(handle_client, "0.0.0.0", PORT, max_size=50 * 1024 * 1024)
     await server.wait_closed()
 
 if __name__ == "__main__":

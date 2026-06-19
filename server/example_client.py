@@ -1,12 +1,15 @@
 import asyncio
 import websockets
 import json
+import base64
+import mimetypes
+import os
 
 async def main():
     uri = "ws://localhost:3200"
     print(f"Connecting to {uri}...")
-    
-    async with websockets.connect(uri) as websocket:
+    # Connect with a large max_size to allow High-Res reference images (50 MB)
+    async with websockets.connect(uri, max_size=50 * 1024 * 1024) as websocket:
         # 1. Identify as a controller
         await websocket.send(json.dumps({"role": "controller"}))
         
@@ -23,14 +26,33 @@ async def main():
         # 3. Send a generation command
         command = {
             "type": "generate",
-            "prompt": "A futuristic city in neon colors, cyberpunk style",
+            "prompt": "make cat color as red",
             "count": 1,
             "delay": 30,
             "upscale": True,
             "videoMode": False,
             "prefix": "cyber_"
         }
-        print("\nSending command:", json.dumps(command, indent=2))
+
+        # --- HOW TO ADD A REFERENCE IMAGE ---
+        # Provide a valid path to an image file here to test it:
+        image_path = "C:\\AI\\imgs\\image1.jpeg" 
+        
+        if os.path.exists(image_path):
+            print(f"Attaching reference image: {image_path}")
+            with open(image_path, "rb") as f:
+                img_data = base64.b64encode(f.read()).decode("utf-8")
+            mime_type, _ = mimetypes.guess_type(image_path)
+            mime_type = mime_type or "image/jpeg"
+            
+            command["imageData"] = f"data:{mime_type};base64,{img_data}"
+            command["imageMimeType"] = mime_type
+            command["imageName"] = os.path.basename(image_path)
+        else:
+            print(f"Note: Reference image '{image_path}' not found, generating without it.")
+        # ------------------------------------
+
+        print("\nSending command:", json.dumps({**command, "imageData": "...base64..." if "imageData" in command else None}, indent=2))
         await websocket.send(json.dumps(command))
         
         # 4. Listen for real-time logs and updates
