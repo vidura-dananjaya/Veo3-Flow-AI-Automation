@@ -26,11 +26,11 @@ async def main():
         # 3. Send a generation command
         command = {
             "type": "generate",
-            "prompt": "make cat color as red",
+            "prompt": "make a dancing cat",
             "count": 1,
             "delay": 30,
             "upscale": True,
-            "videoMode": False,
+            "videoMode": True,
             "prefix": "cyber_"
         }
 
