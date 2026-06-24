@@ -206,12 +206,24 @@ async def watch_folder():
             except Exception as e:
                 logging.error(f"Failed to create directory {folder_path}: {e}")
 
-    logging.info(f"Started folder monitor for: {FILES_RETRIEVE_PATH}")
+    # Record existing files to ignore them
+    existing_files = set()
+    if os.path.exists(FILES_RETRIEVE_PATH):
+        try:
+            for filename in os.listdir(FILES_RETRIEVE_PATH):
+                existing_files.add(filename)
+        except Exception as e:
+            logging.error(f"Error reading initial files: {e}")
+
+    logging.info(f"Started folder monitor for: {FILES_RETRIEVE_PATH}. Ignoring {len(existing_files)} existing files.")
     
     while True:
         if os.path.exists(FILES_RETRIEVE_PATH):
             try:
                 for filename in os.listdir(FILES_RETRIEVE_PATH):
+                    if filename in existing_files:
+                        continue
+                        
                     file_path = os.path.join(FILES_RETRIEVE_PATH, filename)
                     
                     if os.path.isfile(file_path):
