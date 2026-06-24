@@ -3,11 +3,48 @@ import websockets
 import json
 import logging
 import time
+import os
+import shutil
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 
 # Port for WebSocket Server
 PORT = 3200
+
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
+
+def load_config():
+    default_config = {
+        "FILES_RETRIEVE_PATH": r"C:\path\to\retrieve",
+        "IMAGE_FILE_PATH": r"C:\path\to\images",
+        "VIDEO_FILE_PATH": r"C:\path\to\videos"
+    }
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            logging.error(f"Error reading {CONFIG_FILE}: {e}")
+    else:
+        # Create default config file if it doesn't exist
+        try:
+            with open(CONFIG_FILE, 'w') as f:
+                json.dump(default_config, f, indent=4)
+        except Exception as e:
+            logging.error(f"Error creating {CONFIG_FILE}: {e}")
+            
+    return default_config
+
+config = load_config()
+
+# Folder Configurations
+FILES_RETRIEVE_PATH = config.get("FILES_RETRIEVE_PATH", "")
+IMAGE_FILE_PATH = config.get("IMAGE_FILE_PATH", "")
+VIDEO_FILE_PATH = config.get("VIDEO_FILE_PATH", "")
+
+# Supported Extensions
+IMAGE_EXTENSIONS = {'.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.tiff'}
+VIDEO_EXTENSIONS = {'.mp4', '.avi', '.mov', '.mkv', '.wmv', '.webm', '.flv'}
 
 # Store connected clients
 extensions = set()
@@ -158,6 +195,48 @@ async def handle_client(websocket, path="/"):
             controllers.remove(websocket)
             logging.info(f"Controller disconnected. Total controllers: {len(controllers)}")
 
+async def watch_folder():
+    """Asynchronously monitor the retrieve path and move files based on their extensions."""
+    # Ensure directories exist
+    for folder_path in [FILES_RETRIEVE_PATH, IMAGE_FILE_PATH, VIDEO_FILE_PATH]:
+        if folder_path and not os.path.exists(folder_path):
+            try:
+                os.makedirs(folder_path, exist_ok=True)
+                logging.info(f"Created directory: {folder_path}")
+            except Exception as e:
+                logging.error(f"Failed to create directory {folder_path}: {e}")
+
+    logging.info(f"Started folder monitor for: {FILES_RETRIEVE_PATH}")
+    
+    while True:
+        if os.path.exists(FILES_RETRIEVE_PATH):
+            try:
+                for filename in os.listdir(FILES_RETRIEVE_PATH):
+                    file_path = os.path.join(FILES_RETRIEVE_PATH, filename)
+                    
+                    if os.path.isfile(file_path):
+                        _, ext = os.path.splitext(filename)
+                        ext = ext.lower()
+                        
+                        target_dir = None
+                        if ext in IMAGE_EXTENSIONS:
+                            target_dir = IMAGE_FILE_PATH
+                        elif ext in VIDEO_EXTENSIONS:
+                            target_dir = VIDEO_FILE_PATH
+                            
+                        if target_dir:
+                            dest_path = os.path.join(target_dir, filename)
+                            try:
+                                shutil.move(file_path, dest_path)
+                                logging.info(f"Moved {filename} -> {target_dir}")
+                            except Exception:
+                                # Ignore error (file might be currently writing), try again next tick
+                                pass
+            except Exception as e:
+                logging.error(f"Folder monitor error: {e}")
+        
+        await asyncio.sleep(2)  # Check folder every 2 seconds
+
 async def main():
     print("""
 +========================================================+
@@ -166,6 +245,9 @@ async def main():
 +========================================================+
 Waiting for Chrome Extension or Python Scripts to connect...
 """)
+    
+    # Start the folder watcher task
+    asyncio.create_task(watch_folder())
     
     # Start WebSocket Server with a large max_size to allow High-Res reference images (50 MB)
     server = await websockets.serve(handle_client, "0.0.0.0", PORT, max_size=50 * 1024 * 1024)
