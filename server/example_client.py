@@ -4,8 +4,24 @@ import json
 import base64
 import mimetypes
 import os
+import sys
 
-async def main():
+CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
+
+def load_config():
+    if os.path.exists(CONFIG_FILE):
+        try:
+            with open(CONFIG_FILE, 'r') as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+async def main(input_data):
+    if not input_data.get("prompt"):
+        print("Error: 'prompt' is missing or empty in the provided JSON. Process stopped.")
+        return
+
     uri = "ws://localhost:3200"
     print(f"Connecting to {uri}...")
     # Connect with a large max_size to allow High-Res reference images (50 MB)
@@ -26,30 +42,35 @@ async def main():
         # 3. Send a generation command
         command = {
             "type": "generate",
-            "prompt": "make a dancing cat",
+            "prompt": input_data.get("prompt", ""),
             "count": 1,
             "delay": 30,
             "upscale": True,
-            "videoMode": True,
+            "videoMode": input_data.get("videoMode", False),
             "prefix": "cyber_"
         }
 
         # --- HOW TO ADD A REFERENCE IMAGE ---
-        # Provide a valid path to an image file here to test it:
-        image_path = "C:\\AI\\imgs\\image1.jpeg" 
-        
-        if os.path.exists(image_path):
-            print(f"Attaching reference image: {image_path}")
-            with open(image_path, "rb") as f:
-                img_data = base64.b64encode(f.read()).decode("utf-8")
-            mime_type, _ = mimetypes.guess_type(image_path)
-            mime_type = mime_type or "image/jpeg"
+        image_name = input_data.get("imageName")
+        if image_name:
+            config = load_config()
+            image_file_path_base = config.get("IMAGE_FILE_PATH", "")
+            image_path = os.path.join(image_file_path_base, image_name)
             
-            command["imageData"] = f"data:{mime_type};base64,{img_data}"
-            command["imageMimeType"] = mime_type
-            command["imageName"] = os.path.basename(image_path)
+            if os.path.exists(image_path):
+                print(f"Attaching reference image: {image_path}")
+                with open(image_path, "rb") as f:
+                    img_data = base64.b64encode(f.read()).decode("utf-8")
+                mime_type, _ = mimetypes.guess_type(image_path)
+                mime_type = mime_type or "image/jpeg"
+                
+                command["imageData"] = f"data:{mime_type};base64,{img_data}"
+                command["imageMimeType"] = mime_type
+                command["imageName"] = image_name
+            else:
+                print(f"Note: Reference image '{image_path}' not found, generating without it.")
         else:
-            print(f"Note: Reference image '{image_path}' not found, generating without it.")
+            print("Note: No imageName provided in the input, generating without it.")
         # ------------------------------------
 
         print("\nSending command:", json.dumps({**command, "imageData": "...base64..." if "imageData" in command else None}, indent=2))
@@ -81,4 +102,18 @@ async def main():
             print("Connection closed by server.")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    if len(sys.argv) > 1:
+        try:
+            input_json = json.loads(sys.argv[1])
+        except json.JSONDecodeError:
+            print("Error: Invalid JSON provided as argument.")
+            sys.exit(1)
+    else:
+        # Default test payload if no arguments are passed
+        input_json = {
+            "prompt": "make a dancing cat",
+            "videoMode": False,
+            "imageName": "1.jpg"
+        }
+        
+    asyncio.run(main(input_json))
