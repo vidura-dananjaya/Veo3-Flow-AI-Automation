@@ -5,9 +5,9 @@ if __name__ == "__main__":
     # Example JSON object / dictionary to pass
     payload = {
         "prompt": "make asmr feeling",
-        "videoMode": True,
+        "videoMode": False,
         "imageName": "1.jpg",
-        "sequence": 1
+        "sequence": 2
     }
     
     print("Executing prompt via example_client...")
