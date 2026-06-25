@@ -195,6 +195,18 @@ async def handle_client(websocket, path="/"):
             controllers.remove(websocket)
             logging.info(f"Controller disconnected. Total controllers: {len(controllers)}")
 
+def get_next_filename(target_dir, ext):
+    max_num = 0
+    if os.path.exists(target_dir):
+        for fname in os.listdir(target_dir):
+            base_name, _ = os.path.splitext(fname)
+            if base_name.isdigit():
+                num = int(base_name)
+                if num > max_num:
+                    max_num = num
+    next_num = max_num + 1
+    return f"{next_num}{ext}"
+
 async def watch_folder():
     """Asynchronously monitor the retrieve path and move files based on their extensions."""
     # Ensure directories exist
@@ -237,10 +249,11 @@ async def watch_folder():
                             target_dir = VIDEO_FILE_PATH
                             
                         if target_dir:
-                            dest_path = os.path.join(target_dir, filename)
+                            next_filename = get_next_filename(target_dir, ext)
+                            dest_path = os.path.join(target_dir, next_filename)
                             try:
                                 shutil.move(file_path, dest_path)
-                                logging.info(f"Moved {filename} -> {target_dir}")
+                                logging.info(f"Moved {filename} -> {dest_path}")
                             except Exception:
                                 # Ignore error (file might be currently writing), try again next tick
                                 pass
