@@ -6,7 +6,8 @@ if __name__ == "__main__":
     payload = {
         "prompt": "make asmr feeling",
         "videoMode": True,
-        "imageName": "1.jpg"
+        "imageName": "1.jpg",
+        "sequence": 1
     }
     
     print("Executing prompt via example_client...")

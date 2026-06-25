@@ -89,6 +89,29 @@ async def main(input_data):
                         
                     if "running" in data["data"] and data["data"]["running"] is False:
                         print("\nGeneration finished!")
+                        
+                        if "sequence" in input_data:
+                            sequence_val = input_data["sequence"]
+                            config = load_config()
+                            
+                            if input_data.get("videoMode"):
+                                target_path = config.get("VIDEO_FILE_PATH", "")
+                            else:
+                                target_path = config.get("IMAGE_FILE_PATH", "")
+                                
+                            if target_path:
+                                print(f"\nWaiting for file with sequence '{sequence_val}' to be created in {target_path}...")
+                                file_found = False
+                                while not file_found:
+                                    if os.path.exists(target_path):
+                                        for filename in os.listdir(target_path):
+                                            name, ext = os.path.splitext(filename)
+                                            if name == str(sequence_val):
+                                                file_found = True
+                                                break
+                                    if not file_found:
+                                        await asyncio.sleep(1)
+                                print("success")
                         break
                         
                 elif data.get("type") == "error":
@@ -113,7 +136,8 @@ if __name__ == "__main__":
         input_json = {
             "prompt": "make a dancing cat",
             "videoMode": False,
-            "imageName": "1.jpg"
+            "imageName": "1.jpg",
+            "sequence": 1
         }
         
     asyncio.run(main(input_json))
