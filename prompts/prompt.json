@@ -1,20 +1,20 @@
 [
     {
-        "prompt": "make asmr feeling",
+        "prompt": "Make cute baby girl that wearing a  red t shrit",
         "videoMode": false,
-        "imageName": "1.jpg",
+        "imageName": "",
         "sequence": 1
     },
     {
-        "prompt": "relaxing rain sounds",
+        "prompt": "make the baby girl  like singing like a human",
         "videoMode": false,
-        "imageName": "2.jpg",
+        "imageName": "1.jpeg",
         "sequence": 2
     },
     {
-        "prompt": "calm ocean waves",
-        "videoMode": true,
-        "imageName": "3.jpg",
+        "prompt": "make the baby girl like singing with a cute baby boy",
+        "videoMode": false,
+        "imageName": "2.jpeg",
         "sequence": 3
     }
 ]
