@@ -1,0 +1,20 @@
+[
+    {
+        "prompt": "make asmr feeling",
+        "videoMode": false,
+        "imageName": "1.jpg",
+        "sequence": 1
+    },
+    {
+        "prompt": "relaxing rain sounds",
+        "videoMode": false,
+        "imageName": "2.jpg",
+        "sequence": 2
+    },
+    {
+        "prompt": "calm ocean waves",
+        "videoMode": true,
+        "imageName": "3.jpg",
+        "sequence": 3
+    }
+]

@@ -1,5 +1,6 @@
 {
   "FILES_RETRIEVE_PATH": "C:\\Users\\Vidura\\Downloads",
   "IMAGE_FILE_PATH": "C:\\TEST\\Images",
-  "VIDEO_FILE_PATH": "C:\\TEST\\Videos"
+  "VIDEO_FILE_PATH": "C:\\TEST\\Videos",
+  "PROMPT_FILE_PATH": "C:\\Users\\Vidura\\Documents\\AI\\Veo3-Flow-AI-Automation\\prompts\\prompt.json"
 }
