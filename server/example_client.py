@@ -112,6 +112,43 @@ async def main(input_data):
                                     if not file_found:
                                         await asyncio.sleep(1)
                                 print("success")
+                                
+                                if input_data.get("videoMode") and input_data.get("takeLastScreenShot"):
+                                    try:
+                                        import cv2
+                                        video_file_path = None
+                                        for filename in os.listdir(target_path):
+                                            name, ext = os.path.splitext(filename)
+                                            if name == str(sequence_val):
+                                                video_file_path = os.path.join(target_path, filename)
+                                                break
+                                        
+                                        if video_file_path:
+                                            image_target_path = config.get("IMAGE_FILE_PATH", "")
+                                            if image_target_path:
+                                                os.makedirs(image_target_path, exist_ok=True)
+                                                image_file = os.path.join(image_target_path, f"{sequence_val}.jpeg")
+                                                print(f"Extracting last frame from {video_file_path} to {image_file}...")
+                                                cap = cv2.VideoCapture(video_file_path)
+                                                if cap.isOpened():
+                                                    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+                                                    if total_frames > 0:
+                                                        cap.set(cv2.CAP_PROP_POS_FRAMES, max(0, total_frames - 1))
+                                                        ret, frame = cap.read()
+                                                        if ret:
+                                                            cv2.imwrite(image_file, frame)
+                                                            print("Screenshot saved successfully.")
+                                                        else:
+                                                            print("Failed to read the last frame.")
+                                                    else:
+                                                        print("Video has no frames.")
+                                                    cap.release()
+                                                else:
+                                                    print("Failed to open video file.")
+                                    except ImportError:
+                                        print("Error: cv2 module not found. Please run 'pip install opencv-python'.")
+                                    except Exception as e:
+                                        print(f"Error extracting screenshot: {e}")
                         break
                         
                 elif data.get("type") == "error":
