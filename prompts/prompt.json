@@ -3,18 +3,21 @@
         "prompt": "Make cute baby girl that wearing a  red t shrit",
         "videoMode": false,
         "imageName": "",
-        "sequence": 1
+        "sequence": 1,
+        "takeLastScreenShot": false
     },
     {
         "prompt": "make the baby girl  like singing like a human",
         "videoMode": false,
         "imageName": "1.jpeg",
-        "sequence": 2
+        "sequence": 2,
+        "takeLastScreenShot": false
     },
     {
         "prompt": "make the baby girl like singing with a cute baby boy",
         "videoMode": false,
         "imageName": "2.jpeg",
-        "sequence": 3
+        "sequence": 3,
+        "takeLastScreenShot": false
     }
 ]
