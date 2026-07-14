@@ -1,0 +1,16 @@
+[
+    {
+        "prompt": "prompt 1",
+        "videoMode": true,
+        "imageName": "",
+        "sequence": 1,
+        "takeLastScreenShot": true
+    },
+    {
+        "prompt": "prompt 2",
+        "videoMode": true,
+        "imageName": "",
+        "sequence": 2,
+        "takeLastScreenShot": true
+    }
+]
