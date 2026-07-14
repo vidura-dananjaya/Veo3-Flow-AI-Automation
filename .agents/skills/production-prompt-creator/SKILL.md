@@ -37,7 +37,7 @@ Iterate through the JSON array from the source file and create a new JSON array.
 2. **videoMode**: If the `Prompt Type` in the source object is `1` (Video), set `"videoMode": true`. For any other value, set `"videoMode": false`.
 3. **takeLastScreenShot**: If the user answered **Yes** to the "Consistency Frame" question AND the `Prompt Type` is `1` (Video), you MUST add `"takeLastScreenShot": true` to the destination object. If the user answered No or it is an Image prompt, you can set it to `false` or omit it.
 4. **sequence**: Add a `"sequence"` key. The value must be an integer starting at `1` for the first prompt, and incrementing by 1 for each subsequent prompt (e.g., 1, 2, 3, 4, 5).
-5. **imageName**: Add the key `"imageName": ""` with an empty string.
+5. **imageName**: If the user answered **Yes** to the "Consistency Frame" question, set `"imageName": ""` for the first prompt (sequence 1). For all subsequent prompts, set `"imageName": "{N}.jpeg"`, where N increments starting from 1 (e.g., sequence 2 gets "1.jpeg", sequence 3 gets "2.jpeg"). If they answered No, set `"imageName": ""` for all prompts.
 
 ### 4. Output the Final File
 Write the newly constructed JSON array to `prompts/prompt.json` (relative to the workspace root: `C:\Users\Vidura\Documents\AI\Veo3-Flow-AI-Automation\prompts\prompt.json`). Use the `write_to_file` tool with `Overwrite: true` to completely replace the existing file with your new production JSON array.
