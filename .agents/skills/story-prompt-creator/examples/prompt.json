@@ -1,0 +1,12 @@
+[
+    {
+        "prompt": "example realistic video prompt 1",
+        "Prompt Type": 1,
+        "Generation Type": 2
+    },
+    {
+        "prompt": "example cinematic video prompt 2",
+        "Prompt Type": 1,
+        "Generation Type": 1
+    }
+]
