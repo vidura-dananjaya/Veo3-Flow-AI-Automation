@@ -9,7 +9,7 @@
     {
         "prompt": "prompt 2",
         "videoMode": true,
-        "imageName": "",
+        "imageName": "1.jpeg",
         "sequence": 2,
         "takeLastScreenShot": true
     }
