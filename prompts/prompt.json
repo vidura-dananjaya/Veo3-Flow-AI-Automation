@@ -1,9 +1,23 @@
 [
     {
-        "prompt": "Make cute baby girl that wearing a  red t shrit and dancing",
+        "prompt": "Ultra-realistic, 100% natural cinematic video. A beautiful, chubby 8-month-old baby girl named Emma, with big bright eyes and soft fine hair, wearing a pure white cotton onesie, is sitting peacefully in a tranquil, spa-like environment. Warm, diffused natural sunlight streams through a nearby window, creating a serene golden-hour glow over her. The camera slowly pushes in on her innocent, glowing face. 4k resolution, cinematic soft lighting.",
         "videoMode": true,
         "imageName": "",
         "sequence": 1,
+        "takeLastScreenShot": true
+    },
+    {
+        "prompt": "Ultra-realistic, 100% natural cinematic video. Extreme close-up macro shot in the same tranquil, sunlit spa environment. Baby Emma's (white cotton onesie) tiny, delicate feet are gently lowered into a crystal-clear glass tank of pristine water. Dozens of tiny, harmless Garra rufa fish immediately begin to swarm around her toes. The visual of the small fish darting rhythmically through the clear water creates a hypnotic, deeply relaxing ASMR visual. Slow motion, 4k.",
+        "videoMode": true,
+        "imageName": "",
+        "sequence": 2,
+        "takeLastScreenShot": true
+    },
+    {
+        "prompt": "Ultra-realistic, 100% natural cinematic video. A heartwarming final mid-shot of Baby Emma (big bright eyes, soft fine hair, white cotton onesie) in the tranquil, golden-lit spa setting. The slight tickling sensation from the fish in the clear tank below elicits pure, unscripted giggles and a radiant smile from her. Her innocent joy, set against the soft natural lighting and ambient water environment, creates a perfect, sensory-rich viral ASMR moment. Cinematic, 4k.",
+        "videoMode": true,
+        "imageName": "",
+        "sequence": 3,
         "takeLastScreenShot": true
     }
 ]
