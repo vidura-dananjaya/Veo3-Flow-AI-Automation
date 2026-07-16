@@ -1,23 +1,23 @@
 [
-    {
-        "prompt": "High quality 3D render, detailed 3D animation style. A medium close-up of an adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and a few strands of soft blonde-brown hair, lying comfortably on a fluffy, pure white baby towel. Soft, warm natural golden hour lighting, pastel aesthetic. She is looking calmly at the camera. A pair of neatly manicured adult hands slowly bring a beautifully packaged baby face cream jar into the frame, twisting the cap open and peeling back the foil seal.",
-        "videoMode": true,
-        "takeLastScreenShot": true,
-        "sequence": 1,
-        "imageName": ""
-    },
-    {
-        "prompt": "High quality 3D render, detailed 3D animation style. An extreme close-up of the same adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and soft blonde-brown hair. Soft, warm natural golden hour lighting, pastel aesthetic. The adult's index and middle fingers gently scoop smooth white cream and softly dot it onto the baby's forehead, cheeks, nose tip, and chin. The baby blinks slowly and gives a tiny, gummy smile, enjoying the soothing sensation.",
-        "videoMode": true,
-        "takeLastScreenShot": true,
-        "sequence": 2,
-        "imageName": "1.jpeg"
-    },
-    {
-        "prompt": "High quality 3D render, detailed 3D animation style. A medium close-up of the same adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and soft blonde-brown hair. Soft, warm natural golden hour lighting, pastel aesthetic. The adult hands use both thumbs and fingertips to gently massage the cream into the baby's cheeks and forehead using slow, upward circular motions. The baby looks incredibly peaceful, her glowing skin absorbing the cream as her eyes slowly droop, letting out a tiny, relaxed yawn.",
-        "videoMode": true,
-        "takeLastScreenShot": true,
-        "sequence": 3,
-        "imageName": "2.jpeg"
-    }
+  {
+    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. A kind, calm European mother with gentle hands is rubbing baby lotion between her palms. Her cute 6-month-old European baby girl, wearing a soft pink dress, is lying on her back on a comfortable changing pad. The mother begins to gently stroke the baby's legs and arms downwards in a soothing, rhythmic motion. The baby girl looks up at her mother with relaxed, sleepy eyes. High quality ASMR audio featuring the crisp sound of lotion and soft rustling of the pink dress, strictly no background music.",
+    "videoMode": true,
+    "takeLastScreenShot": true,
+    "sequence": 1,
+    "imageName": ""
+  },
+  {
+    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. Close-up on the cute 6-month-old European baby girl in her soft pink dress. The kind European mother gently adjusts the dress and performs a slow, circular clockwise 'I Love You' massage stroke on the baby's tummy. The baby's eyelids start to feel heavy and begin to droop as she lets out a very soft, sleepy sigh. High quality ASMR audio featuring gentle skin-gliding sounds and a faint breathy 'shhhhhh' sound from the mother, strictly no background music.",
+    "videoMode": true,
+    "takeLastScreenShot": true,
+    "sequence": 2,
+    "imageName": "1.jpeg"
+  },
+  {
+    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. Extreme close-up on the cute 6-month-old European baby girl's face. The kind European mother uses her thumb pads to gently stroke from the center of the baby's forehead outwards to the temples, then traces small circles around the sides of her face. The baby girl's eyes flutter a few times before closing completely, falling into a deep, peaceful sleep. The mother's hands gently rest on the baby's chest. High quality ASMR audio featuring soft thumb strokes and the baby's rhythmic deep breathing, strictly no background music.",
+    "videoMode": true,
+    "takeLastScreenShot": true,
+    "sequence": 3,
+    "imageName": "2.jpeg"
+  }
 ]

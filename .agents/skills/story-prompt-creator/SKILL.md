@@ -46,6 +46,8 @@ Draft the prompts incorporating the chosen **Prompt Type** and **Generation Type
 
 **Consistency is paramount:** You MUST maintain strict character and element consistency across all prompts. Ensure that descriptions of characters (age, hair, clothing), environments, lighting, and key objects remain identical from the first prompt to the last so the resulting media feels like a continuous sequence.
 
+**Child Safety Policy:** You MUST ensure all generated prompts strictly adhere to Veo 3 and Omniflash child safety policies. Do not generate any prompts that contain inappropriate, unsafe, or exploitative content involving children.
+
 ### 5. Output as JSON
 Generate the final output as a JSON object array and save it to `.agents/skills/story-prompt-creator/output/prompt.json` using the `write_to_file` tool (with `Overwrite: true`).
 You MUST format the JSON array exactly as shown in the example file located at `.agents/skills/story-prompt-creator/examples/prompt.json`. Ensure each object contains the `prompt`, `Prompt Type`, and `Generation Type` keys with their corresponding values based on the user's answers.
