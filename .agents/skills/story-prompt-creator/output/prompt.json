@@ -1,17 +1,17 @@
 [
-  {
-    "prompt": "3D rendered style video: A wide shot of a tranquil, spa-like room bathed in warm, diffused natural sunlight streaming through a large window, creating a serene, golden-hour glow. In the center, a beautiful, chubby baby wearing a simple, soft white cotton onesie sits calmly next to a crystal-clear glass tank filled with pristine water. The 3D animation is highly detailed, featuring soft lighting and a peaceful atmosphere.",
-    "Prompt Type": 1,
-    "Generation Type": 3
-  },
-  {
-    "prompt": "3D rendered style video: A close-up macro shot focusing on the chubby baby's tiny, delicate feet being gently lowered into the crystal-clear glass tank. Dozens of tiny Garra rufa fish swarm around the toes, darting rhythmically through the pristine water. The scene maintains the warm, diffused golden-hour sunlight from the window. The baby's soft white cotton onesie is visible at the edge of the frame. The 3D animation captures the crisp, clear water ripples and micro-splashes in high detail.",
-    "Prompt Type": 1,
-    "Generation Type": 3
-  },
-  {
-    "prompt": "3D rendered style video: A medium shot capturing the chubby baby in the soft white cotton onesie giggling with pure joy. The baby's feet are submerged in the crystal-clear glass tank while tiny Garra rufa fish gently swim around their toes. The warm, diffused golden-hour sunlight continues to illuminate the tranquil, spa-like room. The 3D animation highlights the baby's soft, expressive facial features and the hypnotic, gentle motion of the water.",
-    "Prompt Type": 1,
-    "Generation Type": 3
-  }
+    {
+        "prompt": "High quality 3D render, detailed 3D animation style. A medium close-up of an adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and a few strands of soft blonde-brown hair, lying comfortably on a fluffy, pure white baby towel. Soft, warm natural golden hour lighting, pastel aesthetic. She is looking calmly at the camera. A pair of neatly manicured adult hands slowly bring a beautifully packaged baby face cream jar into the frame, twisting the cap open and peeling back the foil seal.",
+        "Prompt Type": 1,
+        "Generation Type": 3
+    },
+    {
+        "prompt": "High quality 3D render, detailed 3D animation style. An extreme close-up of the same adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and soft blonde-brown hair. Soft, warm natural golden hour lighting, pastel aesthetic. The adult's index and middle fingers gently scoop smooth white cream and softly dot it onto the baby's forehead, cheeks, nose tip, and chin. The baby blinks slowly and gives a tiny, gummy smile, enjoying the soothing sensation.",
+        "Prompt Type": 1,
+        "Generation Type": 3
+    },
+    {
+        "prompt": "High quality 3D render, detailed 3D animation style. A medium close-up of the same adorable 6-month-old European baby girl with chubby cheeks, bright eyes, and soft blonde-brown hair. Soft, warm natural golden hour lighting, pastel aesthetic. The adult hands use both thumbs and fingertips to gently massage the cream into the baby's cheeks and forehead using slow, upward circular motions. The baby looks incredibly peaceful, her glowing skin absorbing the cream as her eyes slowly droop, letting out a tiny, relaxed yawn.",
+        "Prompt Type": 1,
+        "Generation Type": 3
+    }
 ]
