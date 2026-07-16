@@ -1,23 +1,23 @@
 [
   {
-    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. A kind, calm European mother with gentle hands is rubbing baby lotion between her palms. Her cute 6-month-old European baby girl, wearing a soft pink dress, is lying on her back on a comfortable changing pad. The mother begins to gently stroke the baby's legs and arms downwards in a soothing, rhythmic motion. The baby girl looks up at her mother with relaxed, sleepy eyes. High quality ASMR audio featuring the crisp sound of lotion and soft rustling of the pink dress, strictly no background music.",
+    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Close-up shot of a kind European mother's hands opening a small jar of vibrant orange sweet potato puree and scooping it into a smooth ceramic bowl. The mother stirs the puree slowly and deliberately with a small silicone spoon, ensuring it is very smooth and thin. High quality 3D animation. Natural ASMR audio only (crisp pop of the jar opening, thick squishing sound of puree, soft scraping of the spoon). Do not include background music.",
     "videoMode": true,
-    "takeLastScreenShot": true,
+    "imageName": "",
     "sequence": 1,
-    "imageName": ""
+    "takeLastScreenShot": true
   },
   {
-    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. Close-up on the cute 6-month-old European baby girl in her soft pink dress. The kind European mother gently adjusts the dress and performs a slow, circular clockwise 'I Love You' massage stroke on the baby's tummy. The baby's eyelids start to feel heavy and begin to droop as she lets out a very soft, sleepy sigh. High quality ASMR audio featuring gentle skin-gliding sounds and a faint breathy 'shhhhhh' sound from the mother, strictly no background music.",
+    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Close-up shot of a cute 6-month-old European baby girl sitting upright in her high chair, wearing a soft, clean bib. The kind European mother brings the small silicone spoon filled with sweet potato puree towards the baby's mouth. The baby leans forward, opens her mouth eagerly, tastes the puree, and her eyes widen in surprise before happily swallowing. High quality 3D animation. Natural ASMR audio only (rustling of the bib, baby lip-smacking sounds, soft wet sound of eating, soft satisfied coo). Do not include background music.",
     "videoMode": true,
-    "takeLastScreenShot": true,
+    "imageName": "1.jpeg",
     "sequence": 2,
-    "imageName": "1.jpeg"
+    "takeLastScreenShot": true
   },
   {
-    "prompt": "3D render, highly detailed, 4k video. A dimly lit, warm nursery. Extreme close-up on the cute 6-month-old European baby girl's face. The kind European mother uses her thumb pads to gently stroke from the center of the baby's forehead outwards to the temples, then traces small circles around the sides of her face. The baby girl's eyes flutter a few times before closing completely, falling into a deep, peaceful sleep. The mother's hands gently rest on the baby's chest. High quality ASMR audio featuring soft thumb strokes and the baby's rhythmic deep breathing, strictly no background music.",
+    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Extreme close-up of the same cute 6-month-old European baby girl's face. She has a cute, messy smear of orange sweet potato puree around her mouth and nose, and she smiles happily. She turns her head slightly away from the spoon. The kind European mother's hand enters the frame with a soft, damp cloth and gently wipes the baby's face clean. The baby looks incredibly content and relaxed. High quality 3D animation. Natural ASMR audio only (damp sound of cloth gliding, baby giggles, contented breathy sounds). Do not include background music.",
     "videoMode": true,
-    "takeLastScreenShot": true,
+    "imageName": "2.jpeg",
     "sequence": 3,
-    "imageName": "2.jpeg"
+    "takeLastScreenShot": true
   }
 ]
