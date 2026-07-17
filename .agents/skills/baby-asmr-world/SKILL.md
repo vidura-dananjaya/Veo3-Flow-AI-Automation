@@ -30,6 +30,7 @@ Once the story is ready, invoke the `story-prompt-creator` skill. Pass the follo
 - **Question 1: Prompt Type** = 1 (Video Prompt)
 - **Question 2: Generation Type** = 3 (3D Type)
 - **Question 3: Prompts Length** = [The exact "Video Scenes Count" from Step 1]
+- **IMPORTANT INSTRUCTION**: Explicitly instruct the `story-prompt-creator` to always append "No background music, ASMR natural sounds only." to the text of every generated prompt.
 - Wait until the `story-prompt-creator` skill completes its work and finishes creating the `prompt.json` output file.
 
 ### 4. Create Production Prompts (`production-prompt-creator`)
