@@ -37,3 +37,12 @@ Once the story is ready, invoke the `story-prompt-creator` skill. Pass the follo
 Finally, invoke the `production-prompt-creator` skill to finalize the file. Pass the following strict answer to its prompt without asking the user:
 - **Consistency Frame** = Yes
 - Wait until the `production-prompt-creator` completes writing the final `prompts/prompt.json` file.
+
+### 5. Generate Facebook Publish Details
+As the final step, you MUST generate the Facebook reel publish details.
+- Carefully analyze the `.agents/output/STORY.md` file and the `.agents/skills/story-prompt-creator/output/prompt.json` file.
+- Research and analyze competitive reels in the same niche to understand what goes viral in Europe for Baby ASMR.
+- Create a highly engaging, viral FB reel description in English targeting European countries with a strong Baby ASMR feel.
+- Include exactly 7 of the best, most viral hashtags on a new line at the bottom.
+- You MUST follow the formatting structure found in `.agents/skills/baby-asmr-world/examples/publish-details.txt`.
+- Output this as a single text block and save it to `.agents/skills/baby-asmr-world/output/publish-details.txt` using the `write_to_file` tool.
