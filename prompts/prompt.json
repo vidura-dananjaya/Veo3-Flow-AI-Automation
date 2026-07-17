@@ -1,23 +1,30 @@
 [
   {
-    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Close-up shot of a kind European mother's hands opening a small jar of vibrant orange sweet potato puree and scooping it into a smooth ceramic bowl. The mother stirs the puree slowly and deliberately with a small silicone spoon, ensuring it is very smooth and thin. High quality 3D animation. Natural ASMR audio only (crisp pop of the jar opening, thick squishing sound of puree, soft scraping of the spoon). Do not include background music.",
+    "prompt": "3D rendered style video. A beautifully lit, minimalist European-style bathroom. Extreme close-up of a gentle European mother's hands turning on a brass faucet. Crystal clear warm water flows into a pristine white baby bathtub. She dips a soft natural sea sponge into the water, squeezing it gently. High quality 3D animation. Natural ASMR audio only (continuous trickling of water, soft squelch of the sponge absorbing water). No background music, ASMR natural sounds only.",
     "videoMode": true,
-    "imageName": "",
+    "takeLastScreenShot": true,
     "sequence": 1,
-    "takeLastScreenShot": true
+    "imageName": ""
   },
   {
-    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Close-up shot of a cute 6-month-old European baby girl sitting upright in her high chair, wearing a soft, clean bib. The kind European mother brings the small silicone spoon filled with sweet potato puree towards the baby's mouth. The baby leans forward, opens her mouth eagerly, tastes the puree, and her eyes widen in surprise before happily swallowing. High quality 3D animation. Natural ASMR audio only (rustling of the bib, baby lip-smacking sounds, soft wet sound of eating, soft satisfied coo). Do not include background music.",
+    "prompt": "3D rendered style video. A beautifully lit, minimalist European-style bathroom. Mid-shot of a beautiful, cute 6-month-old European baby girl resting comfortably in the warm water of the pristine white baby bathtub. Her big eyes look curiously at the sponge. The gentle European mother gently strokes the baby's arm with the wet natural sea sponge. High quality 3D animation. Natural ASMR audio only (soft swooshing of the sponge gliding over skin, happy coos, tiny gentle splashes). No background music, ASMR natural sounds only.",
     "videoMode": true,
-    "imageName": "1.jpeg",
+    "takeLastScreenShot": true,
     "sequence": 2,
-    "takeLastScreenShot": true
+    "imageName": "1.jpeg"
   },
   {
-    "prompt": "3D rendered style video. A dimly lit, warm kitchen. Extreme close-up of the same cute 6-month-old European baby girl's face. She has a cute, messy smear of orange sweet potato puree around her mouth and nose, and she smiles happily. She turns her head slightly away from the spoon. The kind European mother's hand enters the frame with a soft, damp cloth and gently wipes the baby's face clean. The baby looks incredibly content and relaxed. High quality 3D animation. Natural ASMR audio only (damp sound of cloth gliding, baby giggles, contented breathy sounds). Do not include background music.",
+    "prompt": "3D rendered style video. A beautifully lit, minimalist European-style bathroom. Extreme close-up of the same beautiful 6-month-old European baby girl's head. The gentle European mother uses a small, smooth wooden cup to slowly pour warm water over the baby's soft hair, massaging the scalp with her fingertips. The baby closes her eyes slightly, letting out a contented sigh. High quality 3D animation. Natural ASMR audio only (hollow sound of wooden cup, gentle cascading water pouring over head, baby sigh). No background music, ASMR natural sounds only.",
     "videoMode": true,
-    "imageName": "2.jpeg",
+    "takeLastScreenShot": true,
     "sequence": 3,
-    "takeLastScreenShot": true
+    "imageName": "2.jpeg"
+  },
+  {
+    "prompt": "3D rendered style video. A soft, dimly lit nursery. Close-up of the beautiful 6-month-old European baby girl being gently lowered onto a plush, white hooded towel on a changing table. The gentle European mother wraps the towel around the baby, creating a cozy burrito, and gently pats her dry, rubbing her tiny feet. The baby looks up with a sleepy, peaceful smile. High quality 3D animation. Natural ASMR audio only (muffled rustling of cotton towel, gentle patting sounds, soft sleepy breathing). No background music, ASMR natural sounds only.",
+    "videoMode": true,
+    "takeLastScreenShot": true,
+    "sequence": 4,
+    "imageName": "3.jpeg"
   }
 ]
