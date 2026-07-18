@@ -30,6 +30,7 @@ Once the story is ready in `STORY.md`, invoke the `.agents\skills\story-prompt-c
 - **Question 3: Prompts Length** = [The exact "Video Scenes Count" from Step 1]
 - **IMPORTANT INSTRUCTION 1**: Explicitly instruct the `story-prompt-creator` that NO background music should be included in any prompt.
 - **IMPORTANT INSTRUCTION 2 (Safety Policy)**: Explicitly instruct the `story-prompt-creator` to carefully draft every prompt so that it strictly complies with Omni Flash AI video generation policies and does not violate policies regarding minors. Ensure the wording prevents the error: "This prompt might violate our policies about generating harmful content related to minors."
+- **IMPORTANT INSTRUCTION 3 (Object Consistency)**: Explicitly instruct the `story-prompt-creator` that when creating the `prompt.json`, the design and details of the objects must strictly maintain consistency across every generated prompt.
 - Wait until the `story-prompt-creator` skill completes its work and finishes creating the `prompt.json` output file.
 
 ### 3. Create Production Prompts (`production-prompt-creator`)
