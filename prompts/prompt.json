@@ -1,23 +1,23 @@
 [
-  {
-    "prompt": "3D rendered style video. A brightly lit, aesthetic European bathroom. Close-up of a gentle European mother's hands gently swirling clear, warm water in a small, secure baby tub. She holds a bright yellow rubber duck and softly places it onto the water surface. High quality 3D animation. Natural ASMR audio only (rhythmic swishing sound of water, subtle plop of the rubber duck, quiet calming ambiance). No background music, ASMR natural sounds only.",
-    "videoMode": true,
-    "takeLastScreenShot": true,
-    "sequence": 1,
-    "imageName": ""
-  },
-  {
-    "prompt": "3D rendered style video. A brightly lit, aesthetic European bathroom. Mid-shot showing a beautiful, happy European baby's face and arms as they sit safely secured in a bath support, wearing a cute little bathing cap. The gentle European mother uses a very soft, natural sea sponge to gently wash the baby's arms and shoulders. The baby looks at the sponge with big, beautiful eyes and smiles. High quality 3D animation. Natural ASMR audio only (squelch of the wet sponge, soft swooshing sounds, adorable happy baby giggle). No background music, ASMR natural sounds only.",
-    "videoMode": true,
-    "takeLastScreenShot": true,
-    "sequence": 2,
-    "imageName": "1.jpeg"
-  },
-  {
-    "prompt": "3D rendered style video. A brightly lit, aesthetic European bathroom. Close-up shot of the same beautiful European baby's clean, happy face. The baby is carefully wrapped in a thick, fluffy white hooded towel shaped like a little bear, with only the face visible. The gentle mother's hands pat the towel dry. The baby looks straight at the camera with a peaceful, sleepy expression. High quality 3D animation. Natural ASMR audio only (muffled rustling of thick cotton towel, gentle patting sounds, soft relaxed sigh). No background music, ASMR natural sounds only.",
-    "videoMode": true,
-    "takeLastScreenShot": true,
-    "sequence": 3,
-    "imageName": "2.jpeg"
-  }
+    {
+        "prompt": "A 100% realistic, ultra-high definition wide shot video from inside a small, cozy rustic wooden log cabin. The sunlight gently streams through the large 360-degree glass windows, revealing a breathtaking view of a calm, misty blue lake surrounded by dark green pine mountains. A beautiful young adult European couple in thick, cozy knitted sweaters sits side-by-side on a plush window seat, looking out. The woman gently cradles a steaming ceramic mug of coffee. No background music, ASMR natural sounds only.",
+        "videoMode": true,
+        "takeLastScreenShot": true,
+        "sequence": 1,
+        "imageName": ""
+    },
+    {
+        "prompt": "A 100% realistic, ultra-high definition close-up shot video from inside the wooden log cabin. The camera focuses on the young adult European couple's hands resting on the rustic wooden windowsill. The man’s hand gently moves to hold the woman's hand. Outside the window, a light, magical morning mist slowly rolls across the mirror-like surface of the blue lake. The lighting is incredibly soft and natural, emphasizing the raw, realistic texture of the wooden logs and their thick wool sweaters. No background music, ASMR natural sounds only.",
+        "videoMode": true,
+        "takeLastScreenShot": true,
+        "sequence": 2,
+        "imageName": "1.jpeg"
+    },
+    {
+        "prompt": "A 100% realistic, ultra-high definition slow panning video from behind the young adult European couple inside the wooden log cabin. The man reaches forward and smoothly pushes open a large pane of the glass window. The couple closes their eyes simultaneously and takes a deep, visible breath, utterly relaxed and connected to the pristine European wilderness lake surrounding their island cabin. No background music, ASMR natural sounds only.",
+        "videoMode": true,
+        "takeLastScreenShot": true,
+        "sequence": 3,
+        "imageName": "2.jpeg"
+    }
 ]
