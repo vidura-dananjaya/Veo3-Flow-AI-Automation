@@ -30,8 +30,9 @@ Once the story is ready, invoke the `story-prompt-creator` skill. Pass the follo
 - **Question 1: Prompt Type** = 1 (Video Prompt)
 - **Question 2: Generation Type** = 3 (3D Type)
 - **Question 3: Prompts Length** = [The exact "Video Scenes Count" from Step 1]
-- **IMPORTANT INSTRUCTION**: Explicitly instruct the `story-prompt-creator` to always append "No background music, ASMR natural sounds only." to the text of every generated prompt.
-- **CRITICAL SAFETY INSTRUCTION**: Explicitly instruct the `story-prompt-creator` to carefully draft every prompt so that it strictly complies with child safety policies. Ensure the wording prevents the error: "This prompt might violate our policies about generating harmful content related to minors" (e.g., avoid ambiguous or sensitive terms regarding minors).
+- **IMPORTANT INSTRUCTION 1**: Explicitly instruct the `story-prompt-creator` to always append "No background music, ASMR natural sounds only." to the text of every generated prompt.
+- **IMPORTANT INSTRUCTION 2 (Safety Policy)**: Explicitly instruct the `story-prompt-creator` to carefully draft every prompt so that it strictly complies with child safety policies. Ensure the wording prevents the error: "This prompt might violate our policies about generating harmful content related to minors" (e.g., avoid ambiguous or sensitive terms regarding minors).
+- **IMPORTANT INSTRUCTION 3 (Object Consistency)**: Explicitly instruct the `story-prompt-creator` that when creating the `prompt.json`, the design and details of the objects must strictly maintain consistency across every generated prompt.
 - Wait until the `story-prompt-creator` skill completes its work and finishes creating the `prompt.json` output file.
 
 ### 4. Create Production Prompts (`production-prompt-creator`)
