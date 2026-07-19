@@ -1,23 +1,16 @@
 [
     {
-        "prompt": "A 3D rendered style video of an adorable 1-year-old infant wearing a light pastel blue cotton romper, sitting securely on the smooth, mossy stone edge of a clear, shallow garden pond. The infant's bare feet are dangling just below the surface of the crystal-clear water. Several vibrant, colorful goldfish are swimming lazily in the background. The sunlight creates gentle, sparkling ripples on the water. No background music, ASMR natural sounds only.",
+        "prompt": "A 3D rendered style video of an adorable, chubby 6-month-old infant wearing only a plain white cloth diaper, sitting on a pristine white fluffy rug in a bright, sunlit room. The infant's face, arms, and tummy are adorably smeared with smooth, rich brown chocolate. The infant holds a large, soft chocolate biscuit, looking at it with wide-eyed wonder before taking a small bite. Soft, warm natural lighting. No background music, ASMR natural sounds only.",
         "videoMode": true,
         "takeLastScreenShot": true,
         "sequence": 1,
         "imageName": ""
     },
     {
-        "prompt": "A 3D rendered style close-up video focusing on the same adorable 1-year-old infant's bare feet submerged in the clear water of the garden pond. The infant is still wearing the identical light pastel blue cotton romper. Three brightly colored goldfish (one vibrant orange, one gold, and one with white spots) gracefully swim right up to the infant's toes. The infant’s little feet stay perfectly still as the fish gently brush past them. The mossy stone edge is visible in the background. No background music, ASMR natural sounds only.",
+        "prompt": "A 3D rendered style slow zoom-in video focusing on the face of the exact same adorable, chubby 6-month-old infant wearing the identical plain white cloth diaper, sitting on the identical pristine white fluffy rug in the sunlit room. The infant's face is still adorably smeared with the same smooth, rich brown chocolate. The infant pauses eating the chocolate biscuit, looks directly at the camera with big, bright eyes, and breaks into a huge, gummy, joyful smile. The warm natural light highlights the glossy texture of the chocolate on their cheeks. No background music, ASMR natural sounds only.",
         "videoMode": true,
         "takeLastScreenShot": true,
         "sequence": 2,
         "imageName": "1.jpeg"
-    },
-    {
-        "prompt": "A 3D rendered style video panning up slightly to show the incredibly happy, curious face of the identical adorable 1-year-old infant wearing the light pastel blue cotton romper, looking down at the water from the mossy stone edge. The infant smiles a wide smile and then gently starts to kick their little bare feet in the water, creating small, joyful splashes. The identical colorful goldfish playfully dart around the gentle splashes in the sunlit garden pond. No background music, ASMR natural sounds only.",
-        "videoMode": true,
-        "takeLastScreenShot": true,
-        "sequence": 3,
-        "imageName": "2.jpeg"
     }
 ]
