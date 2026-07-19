@@ -1,16 +1,23 @@
 [
     {
-        "prompt": "A 3D rendered style video of an adorable, chubby 6-month-old infant wearing only a plain white cloth diaper, sitting on a pristine white fluffy rug in a bright, sunlit room. The infant's face, arms, and tummy are adorably smeared with smooth, rich brown chocolate. The infant holds a large, soft chocolate biscuit, looking at it with wide-eyed wonder before taking a small bite. Soft, warm natural lighting. No background music, ASMR natural sounds only.",
+        "prompt": "3D rendered video of a 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie. The baby is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy, sitting and gently stroking the fur of the puppy. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden. No background music, ASMR natural sounds only.",
         "videoMode": true,
-        "takeLastScreenShot": true,
+        "imageName": "",
         "sequence": 1,
-        "imageName": ""
+        "takeLastScreenShot": true
     },
     {
-        "prompt": "A 3D rendered style slow zoom-in video focusing on the face of the exact same adorable, chubby 6-month-old infant wearing the identical plain white cloth diaper, sitting on the identical pristine white fluffy rug in the sunlit room. The infant's face is still adorably smeared with the same smooth, rich brown chocolate. The infant pauses eating the chocolate biscuit, looks directly at the camera with big, bright eyes, and breaks into a huge, gummy, joyful smile. The warm natural light highlights the glossy texture of the chocolate on their cheeks. No background music, ASMR natural sounds only.",
+        "prompt": "3D rendered video close-up of a 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie. The baby is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy, with the baby and the puppy touching noses affectionately. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden in the softly blurred background. No background music, ASMR natural sounds only.",
         "videoMode": true,
-        "takeLastScreenShot": true,
+        "imageName": "1.jpeg",
         "sequence": 2,
-        "imageName": "1.jpeg"
+        "takeLastScreenShot": true
+    },
+    {
+        "prompt": "3D rendered video of a 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie. The baby is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy. The puppy is resting its head on the baby's lap while the baby smiles warmly and hugs the puppy. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden. No background music, ASMR natural sounds only.",
+        "videoMode": true,
+        "imageName": "2.jpeg",
+        "sequence": 3,
+        "takeLastScreenShot": true
     }
 ]
