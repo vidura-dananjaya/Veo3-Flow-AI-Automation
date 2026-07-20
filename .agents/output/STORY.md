@@ -1,14 +1,10 @@
-# Cute 1-Year-Old Baby Cuddling with Puppy (ASMR)
+# Majestic Black Jaguar in the Dark Forest (ASMR)
 
-**Setting**: A bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden.
-**Character**: A 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie.
-**Object/Animal**: A small, fluffy, golden-brown Golden Retriever puppy.
+**Setting**: A vast, incredibly dense and ancient tropical rainforest. The forest is very dark, shrouded in deep shadows and thick mist, with towering ancient trees, thick hanging vines, and lush, damp ferns covering the forest floor. The atmosphere is mysterious and deeply atmospheric.
+**Character (Animal)**: A majestic, sleek, completely black adult jaguar with piercing yellow-green eyes and a muscular, stealthy build.
 
 ## Scene 1
-The baby is sitting and gently stroking the fur of the puppy. A 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie, is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden.
+The jaguar slowly walking through the dense undergrowth. A majestic, sleek, completely black adult jaguar with piercing yellow-green eyes and a muscular, stealthy build is slowly and silently walking over the damp leaves. The setting is a vast, incredibly dense and ancient tropical rainforest. The forest is very dark, shrouded in deep shadows and thick mist, with towering ancient trees, thick hanging vines, and lush, damp ferns covering the forest floor. The atmosphere is mysterious and deeply atmospheric. (Realistic nature ASMR sounds of soft paws on leaves and distant rainforest echoes, no background music).
 
 ## Scene 2
-Close-up of the baby and the puppy touching noses affectionately. A 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie, is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden in the softly blurred background.
-
-## Scene 3
-The puppy is resting its head on the baby's lap while the baby smiles warmly and hugs the puppy. A 1-year-old Caucasian baby with soft curly blonde hair and bright blue eyes, wearing a pristine white cotton bib over a light pastel yellow long-sleeve onesie, is cuddling and playing with a small, fluffy, golden-brown Golden Retriever puppy. The setting is a bright, sunlit modern European living room with a soft beige fluffy rug and a large window showing a green garden.
+Close-up of the jaguar's face as it pauses in the shadows. A majestic, sleek, completely black adult jaguar with piercing yellow-green eyes and a muscular, stealthy build turns its head slightly, peering through the darkness. The setting is a vast, incredibly dense and ancient tropical rainforest. The forest is very dark, shrouded in deep shadows and thick mist, with towering ancient trees, thick hanging vines, and lush, damp ferns covering the forest floor in the softly blurred background. The atmosphere is mysterious and deeply atmospheric. (Realistic nature ASMR sounds of deep, slow breathing and gentle rustling leaves, no background music).
