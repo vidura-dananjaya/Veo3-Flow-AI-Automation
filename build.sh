@@ -6,7 +6,7 @@ VERSION=$(grep '"version"' src/manifest.json | grep -o '[0-9.]*')
 OUTPUT="flow-extension-app/flow-auto-generator-v${VERSION}.zip"
 
 echo "Building v${VERSION}..."
-mkdir -p ExtOutput
+mkdir -p flow-extension-app
 rm -f "$OUTPUT"
 cd src && zip -r "../$OUTPUT" . && cd ..
 
