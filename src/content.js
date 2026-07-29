@@ -74,14 +74,23 @@ async function handleGenerate(prompt, prefix, index, upscale = false, imageData 
   await slateType(editorEl, prompt);
   await sleep(600);
 
-  // Verify text
+  // Verify the text landed in Flow's own state, not just in the DOM. Text that
+  // only exists in the DOM leaves the send button a silent no-op.
+  let stateText = await getSlatePrompt();
   const visible = editorEl.textContent?.replace(/\u200B/g, '').trim();
-  log('Visible text: "' + visible + '"');
+  log('Visible text: "' + visible + '" | Flow state: ' +
+      (stateText === null ? '(unreadable)' : '"' + stateText + '"'));
 
-  if (!visible || visible === 'What do you want to create?') {
-    log('Text not set — retrying...');
+  const missing = (t) => !t || !t.trim() || t.trim() === 'What do you want to create?';
+  if (stateText === null ? missing(visible) : missing(stateText)) {
+    log('Text not registered — retrying...');
     await slateType(editorEl, prompt);
     await sleep(600);
+    stateText = await getSlatePrompt();
+  }
+
+  if (stateText !== null && missing(stateText)) {
+    throw new Error('Prompt never reached Flow\'s editor state — sending would do nothing.');
   }
 
   // ── STEP 4: Click send ──────────────────────────────────────────────────
@@ -91,7 +100,8 @@ async function handleGenerate(prompt, prefix, index, upscale = false, imageData 
 
   log('Clicking send...');
   const snapshot = captureCurrentMedia();
-  sendBtn.click();
+  const sent = await clickSend(sendBtn, editorEl);
+  if (!sent) throw new Error('Send button found but the click never registered.');
 
   log('Waiting for generated output...');
   let mediaEl = null;
@@ -474,8 +484,54 @@ function checkImageAttached() {
   return false;
 }
 
+// ── Page-world bridge ─────────────────────────────────────────────────────────
+// React's internals are invisible from this isolated world, so anything that
+// needs the Slate editor object goes through page-bridge.js (world: MAIN).
+function pageCall(action, payload = {}, timeout = 5000) {
+  return new Promise((resolve) => {
+    const id = 'fx' + Math.random().toString(36).slice(2);
+
+    const onMsg = (e) => {
+      if (e.source !== window) return;
+      const d = e.data;
+      if (!d || d.tag !== 'flowext-result' || d.id !== id) return;
+      cleanup();
+      resolve(d.result || { ok: false, error: 'empty result' });
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      resolve({ ok: false, error: 'page bridge timeout (is page-bridge.js loaded?)' });
+    }, timeout);
+    const cleanup = () => {
+      window.removeEventListener('message', onMsg);
+      clearTimeout(timer);
+    };
+
+    window.addEventListener('message', onMsg);
+    window.postMessage({ tag: 'flowext-call', id, action, payload }, '*');
+  });
+}
+
+// What Flow itself believes is in the composer — the DOM can disagree.
+async function getSlatePrompt() {
+  const r = await pageCall('getPrompt');
+  return r.ok ? r.text : null;
+}
+
 // ── Type into Slate.js using DataTransfer paste (the only reliable method) ────
 async function slateType(el, text) {
+  // Preferred path: hand the text to Slate's own insertText through the page
+  // bridge. Synthetic paste/execCommand only reaches the DOM — Slate's React
+  // state stays empty, and Flow's send handler then does nothing at all.
+  const viaSlate = await pageCall('setPrompt', { text });
+  if (viaSlate.ok) {
+    log('✓ Prompt written into Slate state via page bridge.');
+    await sleep(200);
+    return;
+  }
+  log('⚠ Page bridge could not set the prompt (' + (viaSlate.error || 'text mismatch') +
+      ') — falling back to synthetic events.');
+
   el.click();
   await sleep(150);
   el.focus();
@@ -563,6 +619,168 @@ async function nuclearFallback(el, text) {
   }
 }
 
+// ── Send the prompt ───────────────────────────────────────────────────────────
+// Flow's send button no longer reacts to a plain el.click(): the React handler
+// listens on the pointer sequence, so a lone synthetic 'click' does nothing.
+// Try progressively heavier strategies, verifying after each one so a working
+// send is never fired twice (that would burn a generation credit).
+async function clickSend(sendBtn, editorEl) {
+  const before = editorText(editorEl);
+  const ref = { btn: sendBtn };
+
+  const attempt = async (name, fn, timeout) => {
+    if (!refreshSendBtn(ref)) {
+      log('Send button no longer on the page — treating the prompt as sent.');
+      return true;
+    }
+    log('Send attempt: ' + name + '...');
+    try { await fn(ref.btn); } catch (e) { log(name + ' failed: ' + e.message); }
+    return waitForSubmitted(editorEl, ref, before, timeout);
+  };
+
+  // First: skip the DOM entirely and call React's own onClick prop through the
+  // page world. Flow's handler reads isTrusted off the event, and a dispatched
+  // event can never carry isTrusted === true — a hand-built one can.
+  if (await attempt('React onClick via page bridge', async () => {
+    const r = await pageCall('reactClick');
+    if (!r.ok) log('bridge reactClick: ' + r.error);
+  }, 2500)) return true;
+
+  if (await attempt('full pointer sequence', b => realClick(b), 2500)) return true;
+  if (await attempt('native click()', b => b.click(), 2500)) return true;
+
+  if (await attempt('form submit', (b) => {
+    const form = b.closest('form') || editorEl?.closest('form');
+    if (!form) { log('No <form> around the composer — skipping.'); return; }
+    if (typeof form.requestSubmit === 'function') form.requestSubmit();
+    else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+  }, 2500)) return true;
+
+  if (editorEl && await attempt('Enter key in editor', () => pressEnter(editorEl), 3000)) return true;
+
+  // Nothing worked. Record which properties Flow's handler actually reads so
+  // the next fix is aimed rather than guessed.
+  const probe = await pageCall('probeClick');
+  if (probe.reads) {
+    log('Handler read these event properties: ' + probe.reads.join(', '));
+    if (probe.threw) log('Handler threw: ' + probe.threw);
+  } else {
+    log('Probe unavailable: ' + (probe.error || 'unknown'));
+  }
+
+  return false;
+}
+
+// React re-renders swap the button node out, leaving us holding a detached
+// element that swallows every click. Re-acquire whenever that happens.
+function refreshSendBtn(ref) {
+  if (ref.btn?.isConnected && ref.btn.offsetParent) return ref.btn;
+  const fresh = findSendButton();
+  if (fresh) {
+    log('Send button was re-rendered — re-acquired.');
+    ref.btn = fresh;
+    return fresh;
+  }
+  return null;
+}
+
+// ── Human-like click ──────────────────────────────────────────────────────────
+// Fires the same event chain a real mouse produces (pointer + mouse + click)
+// with real coordinates, so React/Radix press handlers accept it.
+async function realClick(el) {
+  try { el.scrollIntoView({ block: 'center', inline: 'center' }); } catch (e) {}
+  await sleep(80);
+
+  const r = el.getBoundingClientRect();
+  const x = Math.round(r.left + r.width / 2);
+  const y = Math.round(r.top + r.height / 2);
+
+  // The handler often sits on an inner node (the <i> icon), so aim at whatever
+  // is actually on top — but only if it really belongs to the button.
+  let target = document.elementFromPoint(x, y);
+  if (!target || !(el.contains(target) || target.contains(el))) target = el;
+
+  const mouse = {
+    bubbles: true, cancelable: true, composed: true, view: window,
+    clientX: x, clientY: y, screenX: x, screenY: y, button: 0, detail: 1
+  };
+  const pointer = {
+    ...mouse, pointerId: 1, pointerType: 'mouse', isPrimary: true,
+    width: 1, height: 1
+  };
+
+  target.dispatchEvent(new PointerEvent('pointerover', { ...pointer, buttons: 0, pressure: 0 }));
+  target.dispatchEvent(new MouseEvent('mouseover', { ...mouse, buttons: 0 }));
+  target.dispatchEvent(new PointerEvent('pointermove', { ...pointer, buttons: 0, pressure: 0 }));
+  target.dispatchEvent(new MouseEvent('mousemove', { ...mouse, buttons: 0 }));
+
+  target.dispatchEvent(new PointerEvent('pointerdown', { ...pointer, buttons: 1, pressure: 0.5 }));
+  target.dispatchEvent(new MouseEvent('mousedown', { ...mouse, buttons: 1 }));
+  try { el.focus({ preventScroll: true }); } catch (e) {}
+  await sleep(60);
+
+  target.dispatchEvent(new PointerEvent('pointerup', { ...pointer, buttons: 0, pressure: 0 }));
+  target.dispatchEvent(new MouseEvent('mouseup', { ...mouse, buttons: 0 }));
+  target.dispatchEvent(new MouseEvent('click', { ...mouse, buttons: 0 }));
+}
+
+async function pressEnter(el) {
+  try { el.focus({ preventScroll: true }); } catch (e) {}
+  await sleep(100);
+  const opts = {
+    key: 'Enter', code: 'Enter', keyCode: 13, which: 13,
+    bubbles: true, cancelable: true, composed: true, view: window
+  };
+  el.dispatchEvent(new KeyboardEvent('keydown', opts));
+  el.dispatchEvent(new KeyboardEvent('keypress', opts));
+  el.dispatchEvent(new KeyboardEvent('keyup', opts));
+}
+
+function editorText(el) {
+  return el?.textContent?.replace(/\u200B/g, '').trim() || '';
+}
+
+// A send registered when the composer emptied, or when the send button went
+// away / turned disabled because Flow switched to its busy state. Erring toward
+// "it went through" is deliberate — a false retry costs a generation credit.
+function waitForSubmitted(editorEl, ref, before, timeout = 2500) {
+  return new Promise((resolve) => {
+    const t0 = Date.now();
+    let goneTicks = 0;
+
+    const tick = () => {
+      const now = editorText(editorEl);
+      if (before && now !== before && (!now || now === 'What do you want to create?')) {
+        log('✓ Send registered (prompt box cleared)');
+        resolve(true);
+        return;
+      }
+
+      const btn = refreshSendBtn(ref);
+      if (!btn) {
+        // Require two consecutive ticks so a mid-render blip is not mistaken
+        // for the composer switching to its busy state.
+        if (++goneTicks >= 2) {
+          log('✓ Send registered (send button replaced — composer is busy)');
+          resolve(true);
+          return;
+        }
+      } else {
+        goneTicks = 0;
+        if (btn.disabled || btn.getAttribute('aria-disabled') === 'true') {
+          log('✓ Send registered (send button disabled)');
+          resolve(true);
+          return;
+        }
+      }
+
+      if (Date.now() - t0 > timeout) { resolve(false); return; }
+      setTimeout(tick, 200);
+    };
+    tick();
+  });
+}
+
 // ── Find prompt input ─────────────────────────────────────────────────────────
 function findPromptInput() {
   for (const el of document.querySelectorAll('[contenteditable="true"]')) {
@@ -576,21 +794,56 @@ function findPromptInput() {
 }
 
 // ── Find send button ──────────────────────────────────────────────────────────
+// Flow's styled-components class hashes change on every deploy, so match on
+// what is stable instead: the arrow icon ligature and the hidden "Create" label.
 function findSendButton() {
-  // Confirmed class from DOM inspection
-  for (const btn of document.querySelectorAll('button')) {
-    if (btn.className?.includes('sc-26b30722') && btn.offsetParent && !btn.disabled) return btn;
-  }
-  // Fallback: rightmost small button in bottom bar
   const vh = window.innerHeight;
-  const btns = [...document.querySelectorAll('button')]
-    .filter(b => {
-      if (!b.offsetParent || b.disabled) return false;
-      const r = b.getBoundingClientRect();
-      return r.top > vh * 0.8 && r.width < 60;
-    })
-    .sort((a, b) => b.getBoundingClientRect().left - a.getBoundingClientRect().left);
-  return btns[0] || null;
+
+  const usable = (b) => {
+    if (!b.offsetParent || b.disabled) return false;
+    if (b.getAttribute('aria-disabled') === 'true') return false;
+    const r = b.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  };
+
+  // Buttons sitting in the composer, near the prompt editor
+  const editor = findPromptInput();
+  let scope = null;
+  if (editor) {
+    scope = editor;
+    for (let i = 0; i < 6 && scope.parentElement; i++) scope = scope.parentElement;
+  }
+
+  const btns = [...document.querySelectorAll('button')].filter(usable);
+  const inComposer = (b) => (scope ? scope.contains(b) : false) ||
+    b.getBoundingClientRect().top > vh * 0.5;
+
+  const pick = (list) => list.filter(inComposer).sort(bottomRightFirst)[0] ||
+    list.sort(bottomRightFirst)[0] || null;
+
+  // 1. Icon ligature (<i class="google-symbols">arrow_forward</i>)
+  const byIcon = btns.filter(b =>
+    [...b.querySelectorAll('i, span')].some(n =>
+      /^(arrow_forward|arrow_upward|send)$/.test(n.textContent?.trim() || '')));
+  if (byIcon.length) return pick(byIcon);
+
+  // 2. Accessible name — the visually hidden label or aria-label
+  const byLabel = btns.filter(b =>
+    /\b(send|create|generate)\b/i.test(
+      (b.getAttribute('aria-label') || '') + ' ' + (b.textContent || '')));
+  if (byLabel.length) return pick(byLabel);
+
+  // 3. Last resort: rightmost small button in the bottom bar
+  return btns.filter(b => {
+    const r = b.getBoundingClientRect();
+    return r.top > vh * 0.8 && r.width < 60;
+  }).sort(bottomRightFirst)[0] || null;
+}
+
+// Bottom-most first, then right-most — where a composer's send button lives.
+function bottomRightFirst(a, b) {
+  const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+  return (rb.top - ra.top) || (rb.left - ra.left);
 }
 
 // ── Media helpers ─────────────────────────────────────────────────────────────
@@ -1109,4 +1362,4 @@ async function openDownloadAndClickTarget(targetText) {
   return '__GOOGLE_HANDLED__';
 }
 
-log('v6.5 ready — Video Download support added.');
+log('v6.17 ready — send goes through React\'s own onClick with a hand-built event.');

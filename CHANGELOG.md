@@ -6,7 +6,22 @@
 - **Robust Persistence:** Extension automatically reconnects to the WebSocket server if the connection drops.
 - **No More Sleep:** The Manifest V3 service worker uses a 20s heartbeat loop via the `content.js` script to permanently bypass the 30-second idle termination, preventing stuck/ghost processes.
 
-## v6.14 — Previous
+## v6.17
+- **Fix:** With the prompt finally reaching Flow's state (v6.16), the send still did nothing — including when React's `onClick` was called directly, which returned without throwing. Flow's minified handler reads two properties off the event before acting, and a real mouse click was confirmed to work, so the handler is gated on `isTrusted`. Dispatched events can never satisfy that: `isTrusted` is `[LegacyUnforgeable]`, a non-configurable own property, so `defineProperty` throws on any real `Event`. The bridge now hands the handler a plain object shaped like a React SyntheticEvent — no real `Event` involved, so `isTrusted: true` is simply a property. This became the first send strategy; the DOM-level attempts remain as fallbacks.
+- **New:** `probeClick` — when every send strategy fails, the bridge replays the handler behind a logging `Proxy` and reports the exact property path it read. The next fix gets aimed instead of guessed.
+
+## v6.16
+- **Fix (real root cause):** The send button was never the problem. Flow's composer is a Slate.js editor that keeps the prompt in React state; the synthetic `ClipboardEvent` / `execCommand` writes only reached the DOM, so `editor.children` stayed empty. The button's `onClick` fired normally and then returned silently because the app saw no prompt — which looked exactly like a dead click. Confirmed on the live page: DOM text read `"Generate a image: ffff"` while Slate's state read `""`.
+- **New:** `page-bridge.js`, a `world: "MAIN"` content script. React's `__reactFiber$` / `__reactProps$` expandos are invisible from a content script's isolated world, so the bridge runs in the page world, walks the fiber tree to Flow's Slate editor instance, and calls its own `insertText()`. Content script and bridge talk over `window.postMessage`.
+- **New:** The prompt is now verified against Flow's actual editor state before sending. If the text never reached that state the run fails loudly instead of clicking a button that would do nothing.
+- **New:** Added a "React onClick via page bridge" step to the send chain, which invokes the handler directly with no DOM event involved.
+
+## v6.15
+- **Fix:** The send button stopped responding after Google shipped a new Flow build (visible once the browser cache was cleared). `sendBtn.click()` only fires an untrusted `click` event, and the new composer button acts on the pointer sequence instead — the element was found correctly, but nothing happened. Sending now dispatches the full `pointerover → pointermove → pointerdown → mousedown → pointerup → mouseup → click` chain with real coordinates, then falls back to `click()`, form submit, and finally Enter in the editor. Each attempt is verified (prompt box cleared, or the send button gone/disabled) before the next one runs, so a prompt that did go through is never sent twice.
+- **Fix:** `findSendButton` no longer relies on the styled-components hash `sc-26b30722`, which disappears on every Flow deploy. It now matches the stable `arrow_forward` icon ligature and the button's hidden "Create" label, scoped to the composer around the prompt editor, and honours `aria-disabled` alongside the native `disabled` attribute.
+- **Fix:** If React re-renders and swaps out the send button node mid-send, the extension re-acquires the fresh button instead of clicking a detached element.
+
+## v6.14
 - **Fix:** Implemented an aggressive continuous polling mechanism for media detection. Instead of permanently ignoring elements that fail to download (which accidentally ignored final videos if they shared the same base ID as the placeholder), the script now repeatedly right-clicks the newly added media element every 3 seconds until the native download menu options ("1080p Upscaled" or "Download") appear. This accurately mirrors a human waiting for the exact moment the video finishes generating, providing bulletproof reliability against DOM virtualization and intermediate UI states.
 
 ## v6.13
