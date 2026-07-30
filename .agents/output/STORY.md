@@ -2,7 +2,7 @@
 
 **Scenes Count:** 3
 **Target Audience:** European countries
-**Vibe:** Highly emotional, 100% realistic, heartwarming, viral and addictive
+**Vibe:** Highly emotional, heartwarming, viral and addictive
 
 ## Scene 1: The Ultimate Mother's Love
 During a severe rainstorm on a cold European street, a shivering stray mother dog (a medium-sized mixed breed with scruffy light brown fur) is desperately huddled in a corner. She is wrapping her body around her three very small, fragile newborn puppies, hugging them tightly to protect them from the harsh rain. The mother dog is completely drenched, water dripping from her fur, sacrificing her own comfort and safety to keep her tiny babies warm and dry.
