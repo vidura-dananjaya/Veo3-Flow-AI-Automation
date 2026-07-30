@@ -1,12 +1,17 @@
 [
     {
-        "prompt": "3D rendered video of a fully clothed 1-year-old toddler with big round hazel eyes, soft rosy cheeks, and curly light brown hair, wearing a cozy oversized knitted yellow sweater, sitting safely at a wooden table. In front of the toddler is a large wooden bowl of long, thick, golden ramen noodles. The setting is a softly lit, warm rustic kitchen with wooden countertops and a blurred sunny window in the background. The toddler playfully grabs a handful of the long, thick, golden ramen noodles with their hands, exploring the food safely. The scene captures the realistic ASMR sounds of soft squishing and gentle rustling. No background music, ASMR natural sounds only.",
+        "prompt": "Highly realistic emotional scene. Heavy rain storm in a cold European street. A shivering stray mother dog, a medium-sized mixed breed with scruffy light brown fur, is huddled in a corner. She is wrapping her body around her three very small newborn puppies, hugging them tightly to protect them from the rain. She is completely drenched and shivering, sacrificing herself to keep her puppies warm and dry. cinematic lighting, 8k resolution, ultra-detailed, photorealistic, no background music.",
         "Prompt Type": 1,
-        "Generation Type": 3
+        "Generation Type": 2
     },
     {
-        "prompt": "3D rendered video close-up of a fully clothed 1-year-old toddler with big round hazel eyes, soft rosy cheeks, and curly light brown hair, wearing a cozy oversized knitted yellow sweater, sitting safely at a wooden table. In front of the toddler is a large wooden bowl of long, thick, golden ramen noodles. The setting is a softly lit, warm rustic kitchen with wooden countertops and a blurred sunny window in the background. The toddler brings the handful of long, thick, golden ramen noodles to their mouth and takes a big, joyful bite, slurping the noodles playfully. Small bits of noodles stick safely to their soft rosy cheeks. The scene captures the adorable, satisfying ASMR slurping and chewing sounds. No background music, ASMR natural sounds only.",
+        "prompt": "Highly realistic emotional scene. Heavy rain storm in a cold European street. An elderly man with a kind, weathered face, wearing a thick, worn-out dark green winter jacket, is walking through the rain holding an umbrella. He stops and looks with deep sorrow and empathy at the same shivering stray mother dog, a medium-sized mixed breed with scruffy light brown fur, who is still completely drenched, tightly hugging her three very small newborn puppies to protect them from the rain. cinematic lighting, 8k resolution, ultra-detailed, photorealistic, no background music.",
         "Prompt Type": 1,
-        "Generation Type": 3
+        "Generation Type": 2
+    },
+    {
+        "prompt": "Highly realistic emotional scene. Heavy rain storm in a cold European street. The same elderly man with a kind, weathered face gently places his thick, worn-out dark green winter jacket over the same shivering stray mother dog (medium-sized mixed breed with scruffy light brown fur) and her three very small newborn puppies, creating a warm, dry shelter for them. The mother dog looks up at the elderly man with tear-filled, grateful eyes. cinematic lighting, 8k resolution, ultra-detailed, photorealistic, no background music.",
+        "Prompt Type": 1,
+        "Generation Type": 2
     }
 ]
