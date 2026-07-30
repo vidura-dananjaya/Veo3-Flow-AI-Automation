@@ -24,7 +24,7 @@ Before generating anything, you must ask the user for their preferences regardin
 - 3: General Prompt (Assume outputs should be suitable for both)
 
 **Question 2: Generation Type**
-- 1: Pixar Type (Apply a Pixar cartoon style to the prompts)
+- 1: Cartoon Type (Apply a 2D cartoon animation style to the prompts)
 - 2: Realistic Type (Apply an ultra-realistic, 100% natural style to the prompts)
 - 3: 3D Type (Apply a 3D rendered style to the prompts)
 
