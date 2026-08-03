@@ -54,6 +54,6 @@ Carefully study the user's input and generate a 100% realistic video/image scrip
 - As the final step, instruct the skill to thoroughly analyze the `STORY.md` (from `story-creator`) and `prompt.json` (from `story-prompt-creator`).
 - Generate a 100% fitting, natural, viral description for publishing the content as a single Facebook post.
 - Provide the 5 best viral hashtags plus the `#viral` tag on the last line.
-- Output this directly in English to `output/publish-details.txt`.
+- Output this directly in English to `.agents/skills/pet-show-new/output/publish-details.txt`.
 - When generating the description and hashtags, analyze similar niche competitive posts to provide the best possible output.
-- Instruct the skill to analyze `examples/publish-details.txt` to understand the exact expected format.
+- Instruct the skill to analyze `.agents/skills/pet-show-new/examples/publish-details.txt` to understand the exact expected format.
