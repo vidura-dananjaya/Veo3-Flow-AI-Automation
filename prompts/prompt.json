@@ -1,23 +1,37 @@
 [
     {
-        "prompt": "Pixar cartoon style. Highly emotional scene. Heavy rain storm in a cold European street. A shivering stray mother dog, a medium-sized mixed breed with scruffy light brown fur, is huddled in a corner. She is wrapping her body around her three very small newborn puppies, hugging them tightly to protect them from the rain. She is completely drenched and shivering, sacrificing herself to keep her puppies warm and dry. cinematic lighting, highly detailed, photorealistic textures, no background music.",
+        "prompt": "Highly realistic emotional scene. In the cozy front yard of a rustic European cottage, a happy 8-year-old child with messy light-brown hair, wearing a red and white striped t-shirt, is playing. The child is gently rolling in the green grass with an incredibly cute, fluffy, golden-colored Golden Retriever puppy. They are both full of joy, establishing an instant bond. cinematic lighting, 8k resolution, ultra-detailed, photorealistic textures, no background music.",
         "videoMode": true,
-        "takeLastScreenShot": false,
+        "takeLastScreenShot": true,
         "sequence": 1,
         "imageName": ""
     },
     {
-        "prompt": "Pixar cartoon style. Highly emotional scene. Heavy rain storm in a cold European street. An elderly man with a kind, weathered face, wearing a thick, worn-out dark green winter jacket, is walking through the rain holding an umbrella. He stops and looks with deep sorrow and empathy at the same shivering stray mother dog, a medium-sized mixed breed with scruffy light brown fur, who is still completely drenched, tightly hugging her three very small newborn puppies to protect them from the rain. cinematic lighting, highly detailed, photorealistic textures, no background music.",
+        "prompt": "Highly realistic emotional scene. Inside the cozy rustic European cottage, the same 8-year-old child (with messy light-brown hair, wearing the red and white striped t-shirt) is fast asleep on a warm, thick woven rug. Curled up tightly right next to the child is the same fluffy, golden-colored Golden Retriever puppy. The puppy rests its tiny head on the child's chest, showing deep comfort. cinematic lighting, 8k resolution, ultra-detailed, photorealistic textures, no background music.",
         "videoMode": true,
-        "takeLastScreenShot": false,
+        "takeLastScreenShot": true,
         "sequence": 2,
-        "imageName": ""
+        "imageName": "1.jpeg"
     },
     {
-        "prompt": "Pixar cartoon style. Highly emotional scene. Heavy rain storm in a cold European street. The same elderly man with a kind, weathered face gently places his thick, worn-out dark green winter jacket over the same shivering stray mother dog (medium-sized mixed breed with scruffy light brown fur) and her three very small newborn puppies, creating a warm, dry shelter for them. The mother dog looks up at the elderly man with tear-filled, grateful eyes. cinematic lighting, highly detailed, photorealistic textures, no background music.",
+        "prompt": "Highly realistic emotional scene. It is a rainy, gloomy day outside the rustic European cottage. The same 8-year-old child (with messy light-brown hair, wearing the red and white striped t-shirt) is sitting inside the back seat of a car, waving sadly out the window. Sitting on the porch of the cottage is the same fluffy, golden-colored Golden Retriever puppy, looking incredibly heartbroken and sad as it watches its friend leave. cinematic lighting, 8k resolution, ultra-detailed, photorealistic textures, no background music.",
         "videoMode": true,
-        "takeLastScreenShot": false,
+        "takeLastScreenShot": true,
         "sequence": 3,
-        "imageName": ""
+        "imageName": "2.jpeg"
+    },
+    {
+        "prompt": "Highly realistic emotional scene. Ten years later. A bright, sunny afternoon. An 18-year-old young man with exactly the same messy light-brown hair, now wearing a simple white t-shirt and blue jeans, walks up to the familiar gate of the same rustic European cottage. Sitting patiently by the porch is a large, majestic adult Golden Retriever dog with the same beautiful golden-colored fur, waiting calmly. cinematic lighting, 8k resolution, ultra-detailed, photorealistic textures, no background music.",
+        "videoMode": true,
+        "takeLastScreenShot": true,
+        "sequence": 4,
+        "imageName": "3.jpeg"
+    },
+    {
+        "prompt": "Highly realistic emotional scene. The large, majestic adult Golden Retriever dog with beautiful golden-colored fur instantly recognizes its childhood friend. The dog joyfully jumps up, wrapping its front paws around the 18-year-old young man (with messy light-brown hair, wearing a white t-shirt and blue jeans) in a tight, highly emotional hug in front of the rustic European cottage. The young man has tears of pure joy in his eyes as he hugs the dog back tightly. cinematic lighting, 8k resolution, ultra-detailed, photorealistic textures, no background music.",
+        "videoMode": true,
+        "takeLastScreenShot": true,
+        "sequence": 5,
+        "imageName": "4.jpeg"
     }
 ]

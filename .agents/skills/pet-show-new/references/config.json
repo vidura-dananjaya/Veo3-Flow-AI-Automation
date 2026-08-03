@@ -1,7 +1,7 @@
 {
-	"Scenes Count": 3,
+	"Scenes Count": 5,
 	"Prompt Type": 1,
-	"Generation Type": 1,
-	"Consistency Frame": false,
+	"Generation Type": 2,
+	"Consistency Frame": true,
 	"No Background Music": true
 }
